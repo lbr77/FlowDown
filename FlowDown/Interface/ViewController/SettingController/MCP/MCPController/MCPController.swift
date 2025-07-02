@@ -34,6 +34,13 @@ extension SettingController.SettingContent {
                 MCPClientCell.self,
                 forCellReuseIdentifier: NSStringFromClass(MCPClientCell.self)
             )
+
+            MCPService.shared.clients
+                .ensureMainThread()
+                .sink { [weak self] clients in
+                    self?.updateSnapshot(clients)
+                }
+                .store(in: &cancellable)
         }
 
         @available(*, unavailable)
@@ -83,8 +90,17 @@ extension SettingController.SettingContent {
             snapshot.appendSections([.main])
             snapshot.appendItems(clients.map(\.id), toSection: .main)
             dataSource.apply(snapshot, animatingDifferences: true)
+            updateVisibleItems()
         }
 
+
+        func updateVisibleItems() {
+            var snapshot = dataSource.snapshot()
+            snapshot.reconfigureItems(tableView.indexPathsForVisibleRows?.compactMap {
+                dataSource.itemIdentifier(for: $0)
+            } ?? [])
+            dataSource.apply(snapshot, animatingDifferences: true)
+        }
         static let cellProvider: DataSource.CellProvider = { tableView, indexPath, clientId in
             let cell = tableView.dequeueReusableCell(
                 withIdentifier: NSStringFromClass(MCPClientCell.self),
