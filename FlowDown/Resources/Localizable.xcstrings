@@ -3766,6 +3766,12 @@
         }
       }
     },
+    "No Tools Available" : {
+
+    },
+    "No tools found" : {
+
+    },
     "No web search results." : {
       "localizations" : {
         "zh-Hans" : {

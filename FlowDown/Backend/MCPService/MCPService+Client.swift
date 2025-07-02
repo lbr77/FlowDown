@@ -24,9 +24,11 @@ extension MCPService{
             )
             
         }
+        
+        
         public func listTools() -> [MCPTool] {
             print("[+] Get Tool called.")
-            return []
+            return [MCPTool(tool: Tool.init(name: "123", description: "1234", inputSchema: Value()),client: self.client!)]
         }
         public static func testConfiguration(properties: ModelContextClient) async -> Bool {
             print("[+] Testing MCPClient configuration with endpoint: \(properties.endpoint)")

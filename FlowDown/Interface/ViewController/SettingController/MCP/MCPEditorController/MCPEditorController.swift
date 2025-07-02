@@ -6,8 +6,9 @@ import UIKit
 
 class MCPEditorController: StackScrollController {
     let clientId: ModelContextClient.ID
-    private var client: ModelContextClient?
+    @Published private var client: ModelContextClient?
     var cancellables: Set<AnyCancellable> = .init()
+    private let toolsSectionStackView = UIStackView() // view for tools (to be hidden together.)
 
     init(clientId: ModelContextClient.ID) {
         self.clientId = clientId
@@ -90,6 +91,9 @@ class MCPEditorController: StackScrollController {
         enabledView.actionBlock = { value in
             MCPService.shared.edit(identifier: self.clientId) { client in
                 client.isEnabled = value
+            }
+            UIView.animate(withDuration: 0.3) {
+                self.toolsSectionStackView.isHidden = !value
             }
         }
         enabledView.configure(icon: .init(systemName: "power"))
@@ -255,7 +259,7 @@ class MCPEditorController: StackScrollController {
             guard let client = self.client else { return }
             Task {
                 let result = await MCPService.shared.testConfiguration(properties: client)
-                
+
                 await MainActor.run {
                     if result {
                         Indicator.present(
@@ -278,19 +282,45 @@ class MCPEditorController: StackScrollController {
         testAction.configure(description: String(localized: "Test the configuration of the model context protocol server."))
         stackView.addArrangedSubviewWithMargin(testAction)
         stackView.addArrangedSubview(SeparatorView())
-        
+
         // MARK: - Tools
-        stackView.addArrangedSubviewWithMargin(
+
+        toolsSectionStackView.axis = .vertical
+        toolsSectionStackView.spacing = stackView.spacing
+        toolsSectionStackView.addArrangedSubviewWithMargin( // title
             ConfigurableSectionHeaderView()
                 .with(header: String(localized: "Tools"))
         )
-        
-        if let toolsArray = MCPService.shared.tools.value[clientId] {
-            toolsArray.forEach { tool in 
+        if let toolsArray = MCPService.shared.tools.value[clientId], !toolsArray.isEmpty { // tools available
+            for tool in toolsArray {
+                // do sth.
+                let enabledView = ConfigurableToggleActionView()
+                enabledView.boolValue = true // TODO: Change.
+                enabledView.actionBlock = { value in
+//                    MCPService.shared.edit(identifier: self.clientId) { client in
+//                        client.isEnabled = value
+//                    } // TODO: change this here.
+                }
+                enabledView.configure(icon: .init(systemName: "power"))
+                enabledView.configure(title: tool.interfaceName)
+                enabledView.configure(description: tool.shortDescription)
+                toolsSectionStackView.addArrangedSubviewWithMargin(enabledView)
             }
+        } else {
+            let phView = UILabel() // placeholder
+            phView.text = String(localized: "No Tools Available")
+            phView.text = "No tools found"
+            phView.textColor = .secondaryLabel
+            phView.textAlignment = .center
+            phView.font = .systemFont(ofSize: 16)
+            toolsSectionStackView.addArrangedSubviewWithMargin(phView) { $0.top /= 2 }
         }
+        toolsSectionStackView.addArrangedSubview(SeparatorView())
+        toolsSectionStackView.isHidden = !client.isEnabled
         
-        stackView.addArrangedSubview(SeparatorView())
+        stackView.addArrangedSubview(toolsSectionStackView)
+
+//        }
 
         // MARK: - Management
 
