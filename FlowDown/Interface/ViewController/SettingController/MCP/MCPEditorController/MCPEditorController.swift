@@ -7,7 +7,6 @@ import UIKit
 class MCPEditorController: StackScrollController {
     let clientId: ModelContextClient.ID
     private var client: ModelContextClient?
-
     var cancellables: Set<AnyCancellable> = .init()
 
     init(clientId: ModelContextClient.ID) {
@@ -253,17 +252,44 @@ class MCPEditorController: StackScrollController {
         ) { $0.bottom /= 2 }
         let testAction = ConfigurableActionView { [weak self] _ in
             guard let self else { return }
-            // TODO: Testing method.
+            guard let client = self.client else { return }
+            Task {
+                let result = await MCPService.shared.testConfiguration(properties: client)
+                
+                await MainActor.run {
+                    if result {
+                        Indicator.present(
+                            title: String(localized: "Configuration Tested."),
+                            referencingView: self.view
+                        )
+                    } else {
+                        Indicator.present(
+                            title: String(localized: "Failed"),
+                            message: String(localized: "Please Check Your Configuration"),
+                            preset: .error,
+                            referencingView: self.view
+                        )
+                    }
+                }
+            }
         }
         testAction.configure(icon: UIImage(systemName: "wand.and.stars"))
         testAction.configure(title: String(localized: "Test Configuration"))
         testAction.configure(description: String(localized: "Test the configuration of the model context protocol server."))
         stackView.addArrangedSubviewWithMargin(testAction)
         stackView.addArrangedSubview(SeparatorView())
+        
+        // MARK: - Tools
         stackView.addArrangedSubviewWithMargin(
-            ConfigurableSectionFooterView()
-                .with(footer: String(localized: "Use this to verify if the current configuration is valid. It is recommended to test after making changes."))
-        ) { $0.top /= 2 }
+            ConfigurableSectionHeaderView()
+                .with(header: String(localized: "Tools"))
+        )
+        
+        if let toolsArray = MCPService.shared.tools.value[clientId] {
+            toolsArray.forEach { tool in 
+            }
+        }
+        
         stackView.addArrangedSubview(SeparatorView())
 
         // MARK: - Management

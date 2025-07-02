@@ -876,6 +876,9 @@
         }
       }
     },
+    "Configuration Tested." : {
+
+    },
     "Configure" : {
       "localizations" : {
         "zh-Hans" : {
@@ -4096,6 +4099,9 @@
         }
       }
     },
+    "Please Check Your Configuration" : {
+
+    },
     "Please describe the image." : {
       "localizations" : {
         "zh-Hans" : {
@@ -6076,6 +6082,7 @@
       }
     },
     "Use this to verify if the current configuration is valid. It is recommended to test after making changes." : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
