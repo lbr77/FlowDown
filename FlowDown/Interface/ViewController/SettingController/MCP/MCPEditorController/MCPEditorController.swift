@@ -293,18 +293,8 @@ class MCPEditorController: StackScrollController {
         )
         if let toolsArray = MCPService.shared.tools.value[clientId], !toolsArray.isEmpty { // tools available
             for tool in toolsArray {
-                // do sth.
-                let enabledView = ConfigurableToggleActionView()
-                enabledView.boolValue = true // TODO: Change.
-                enabledView.actionBlock = { value in
-//                    MCPService.shared.edit(identifier: self.clientId) { client in
-//                        client.isEnabled = value
-//                    } // TODO: change this here.
-                }
-                enabledView.configure(icon: .init(systemName: "power"))
-                enabledView.configure(title: tool.interfaceName)
-                enabledView.configure(description: tool.shortDescription)
-                toolsSectionStackView.addArrangedSubviewWithMargin(enabledView)
+                toolsSectionStackView.addArrangedSubviewWithMargin(tool.createConfigurableObjectView() )
+                toolsSectionStackView.addArrangedSubview(SeparatorView())
             }
         } else {
             let phView = UILabel() // placeholder
