@@ -54,4 +54,8 @@ class ModelTool: NSObject, @unchecked Sendable {
         _ = input
         throw NSError()
     }
+
+    nonisolated func execute(with input: String, anchorTo view: UIView, contextID _: String?) async throws -> String {
+        try await execute(with: input, anchorTo: view)
+    }
 }

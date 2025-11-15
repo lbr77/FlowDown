@@ -414,7 +414,7 @@ enum InferenceIntentHandler {
         for call in toolCalls {
             guard let tool = mapping[call.name.lowercased()] else { continue }
             do {
-                _ = try await tool.execute(with: call.args, anchorTo: UIView())
+                _ = try await tool.execute(with: call.args, anchorTo: UIView(), contextID: nil)
             } catch {
                 Logger.model.errorFile("Memory tool \(tool.functionName) failed: \(error.localizedDescription)")
             }

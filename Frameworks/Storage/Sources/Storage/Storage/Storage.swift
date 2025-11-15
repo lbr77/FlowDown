@@ -82,6 +82,7 @@ public class Storage {
                 MigrationV1ToV2(deviceId: Storage.deviceId, requiresDataMigration: true),
                 MigrationV2ToV3(),
                 MigrationV3ToV4(),
+                MigrationV4ToV5(),
             ]
         } else {
             initVersion = .Version1
@@ -89,6 +90,7 @@ public class Storage {
                 MigrationV1ToV2(deviceId: Storage.deviceId, requiresDataMigration: false),
                 MigrationV2ToV3(),
                 MigrationV3ToV4(),
+                MigrationV4ToV5(),
             ]
         }
 
@@ -159,6 +161,7 @@ public class Storage {
             try $0.delete(fromTable: Conversation.tableName)
             try $0.delete(fromTable: ModelContextServer.tableName)
             try $0.delete(fromTable: Memory.tableName)
+            try $0.delete(fromTable: ShortcutTool.tableName)
             try $0.delete(fromTable: SyncMetadata.tableName)
             try $0.delete(fromTable: UploadQueue.tableName)
 
@@ -241,6 +244,7 @@ public extension Storage {
                     try $0.delete(fromTable: CloudModel.tableName, where: CloudModel.Properties.modified <= deleteAt && CloudModel.Properties.removed == true)
                     try $0.delete(fromTable: Memory.tableName, where: Memory.Properties.modified <= deleteAt && Memory.Properties.removed == true)
                     try $0.delete(fromTable: ModelContextServer.tableName, where: ModelContextServer.Properties.modified <= deleteAt && ModelContextServer.Properties.removed == true)
+                    try $0.delete(fromTable: ShortcutTool.tableName, where: ShortcutTool.Properties.modified <= deleteAt && ShortcutTool.Properties.removed == true)
 
                     try $0.delete(fromTable: CloudModel.tableName, where: CloudModel.Properties.objectId == "")
 
@@ -302,6 +306,8 @@ public extension Storage {
                     try expdb.insert(atts, intoTable: Attachment.tableName)
                     let mems: [Memory] = try db.getObjects(fromTable: Memory.tableName)
                     try expdb.insert(mems, intoTable: Memory.tableName)
+                    let shortcuts: [ShortcutTool] = try db.getObjects(fromTable: ShortcutTool.tableName)
+                    try expdb.insert(shortcuts, intoTable: ShortcutTool.tableName)
                     return true
                 } catch {
                     getError = error

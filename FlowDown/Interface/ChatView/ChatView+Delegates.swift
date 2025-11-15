@@ -236,6 +236,7 @@ extension ChatView: RichEditorView.Delegate {
 
     func onRichEditorBuildAlternativeToolsMenu(isEnabled: Bool, requestReload: @escaping (Bool) -> Void) -> [UIMenuElement] {
         let mcpServers = MCPService.shared.servers.value
+        let shortCutTools = ShortcutToolsManager.shared.listShortcutModelTools()
         var toolMenuItems: [UIMenuElement] = [
             UIAction(
                 title: String(localized: "Enabled"),
@@ -316,6 +317,15 @@ extension ChatView: RichEditorView.Delegate {
             toolMenuItems.append(mcpServersMenu)
         }
 
+        if !shortCutTools.isEmpty {
+            let shortcutToolsMenu = UIMenu(
+                title: String(localized: "Shortcut Tools"),
+                options: shortCutTools.count < 5 ? [.displayInline] : [],
+                children: createAction(for: shortCutTools)
+            )
+            toolMenuItems.append(shortcutToolsMenu)
+        }
+
         let settingsMenu = UIMenu(
             title: String(localized: "Shortcuts"),
             children: [
@@ -332,6 +342,14 @@ extension ChatView: RichEditorView.Delegate {
                     image: UIImage(systemName: "wrench.and.screwdriver")
                 ) { [weak self] _ in
                     SettingController.setNextEntryPage(.tools)
+                    let settingController = SettingController()
+                    self?.parentViewController?.present(settingController, animated: true)
+                },
+                UIAction(
+                    title: String(localized: "Shortcut Tools Settings"),
+                    image: UIImage(systemName: "command.circle")
+                ) { [weak self] _ in
+                    SettingController.setNextEntryPage(.shortcutTools)
                     let settingController = SettingController()
                     self?.parentViewController?.present(settingController, animated: true)
                 },

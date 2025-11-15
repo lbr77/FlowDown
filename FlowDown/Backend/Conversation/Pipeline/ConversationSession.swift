@@ -20,6 +20,7 @@ final class ConversationSession: Identifiable {
     private(set) var messages: [Message] = []
     private(set) var attachments: [Message.ID: [Attachment]] = [:]
     private var thinkingDurationTimer: [Message.ID: Timer] = [:]
+    var shortcutCallbackCancellable: AnyCancellable?
 
     private lazy var messagesSubject: CurrentValueSubject<
         ([Message], Bool),

@@ -97,6 +97,7 @@ struct MigrationV1ToV2: DBMigration {
         try db.create(table: CloudModel.tableName, of: CloudModel.self)
         try db.create(table: ModelContextServer.tableName, of: ModelContextServer.self)
         try db.create(table: Memory.tableName, of: Memory.self)
+        try db.create(table: ShortcutTool.tableName, of: ShortcutTool.self)
 
         try db.create(table: SyncMetadata.tableName, of: SyncMetadata.self)
         try db.create(table: UploadQueue.tableName, of: UploadQueue.self)
@@ -392,6 +393,7 @@ struct MigrationV1ToV2: DBMigration {
             Message.self,
             Attachment.self,
             Memory.self,
+            ShortcutTool.self,
         ]
 
         let row = try db.getRow(on: UploadQueue.Properties.id.max(), fromTable: UploadQueue.tableName)
@@ -501,6 +503,24 @@ struct MigrationV3ToV4: DBMigration {
 
         // Add bodyFields column to CloudModel table
         try db.create(table: CloudModel.tableName, of: CloudModel.self)
+
+        try db.exec(StatementPragma().pragma(.userVersion).to(toVersion.rawValue))
+
+        let elapsed = Date.now.timeIntervalSince(start) * 1000.0
+        Logger.database.infoFile("[*] migrate version \(fromVersion.rawValue) -> \(toVersion.rawValue) end elapsed \(Int(elapsed))ms")
+    }
+}
+
+struct MigrationV4ToV5: DBMigration {
+    let fromVersion: DBVersion = .Version4
+    let toVersion: DBVersion = .Version5
+    let requiresDataMigration: Bool = false
+
+    func migrate(db: Database) throws {
+        let start = Date.now
+        Logger.database.infoFile("[*] migrate version \(fromVersion.rawValue) -> \(toVersion.rawValue) begin")
+
+        try db.create(table: ShortcutTool.tableName, of: ShortcutTool.self)
 
         try db.exec(StatementPragma().pragma(.userVersion).to(toVersion.rawValue))
 

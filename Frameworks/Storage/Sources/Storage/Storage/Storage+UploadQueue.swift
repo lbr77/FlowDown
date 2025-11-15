@@ -192,6 +192,23 @@ extension Attachment: Syncable, SyncQueryable {
     }
 }
 
+extension ShortcutTool: Syncable, SyncQueryable {
+    package static let SyncQuery: SyncQueryProperties = .init(
+        objectId: ShortcutTool.Properties.objectId.asProperty(),
+        creation: ShortcutTool.Properties.creation.asProperty(),
+        modified: ShortcutTool.Properties.modified.asProperty(),
+        removed: ShortcutTool.Properties.removed.asProperty()
+    )
+
+    package func encodePayload() throws -> Data {
+        try Storage.encodePayloadSyncable(self)
+    }
+
+    package static func decodePayload(_ data: Data) throws -> Self {
+        try Storage.decodePayloadSyncable(Self.self, data)
+    }
+}
+
 package extension Storage {
     struct DiffSyncableResult<T: Syncable> {
         /// 新增的
@@ -532,6 +549,8 @@ package extension Storage {
                 object.realObject = getObject(Message.self, objectId: object.objectId, handle: handle)
             case Attachment.tableName:
                 object.realObject = getObject(Attachment.self, objectId: object.objectId, handle: handle)
+            case ShortcutTool.tableName:
+                object.realObject = getObject(ShortcutTool.self, objectId: object.objectId, handle: handle)
             default: continue
             }
         }
@@ -556,6 +575,7 @@ package extension Storage {
                 Message.self,
                 Attachment.self,
                 Memory.self,
+                ShortcutTool.self,
             ]
 
             let row = try $0.getRow(on: UploadQueue.Properties.id.max(), fromTable: UploadQueue.tableName)

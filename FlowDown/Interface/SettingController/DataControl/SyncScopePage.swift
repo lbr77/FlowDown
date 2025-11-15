@@ -62,6 +62,13 @@ final class SyncScopePage: StackScrollController {
             group: .models
         )
 
+        addGroupToggle(
+            icon: "gearshape",
+            title: "Shortcut Tools",
+            desc: "Sync your configured Shortcut Tools.",
+            group: .shortcut
+        )
+
         stackView.addArrangedSubviewWithMargin(
             ConfigurableSectionHeaderView().with(
                 header: "Shortcuts"

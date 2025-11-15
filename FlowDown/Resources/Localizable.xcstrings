@@ -2571,6 +2571,9 @@
         }
       }
     },
+    "Configuration for user-defined shortcuts is available within the Shortcut Tools section." : {
+
+    },
     "Configuration Verified" : {
       "localizations" : {
         "en" : {
@@ -4078,6 +4081,12 @@
         }
       }
     },
+    "Describe the parameters this shortcut accepts." : {
+
+    },
+    "Description" : {
+
+    },
     "Determine if this MCP server is enabled. Tools are only updated when this server is enabled." : {
       "localizations" : {
         "en" : {
@@ -4173,6 +4182,9 @@
           }
         }
       }
+    },
+    "Disabled shortcuts are hidden from compatible models." : {
+
     },
     "Disconnected" : {
       "localizations" : {
@@ -4702,6 +4714,9 @@
           }
         }
       }
+    },
+    "Edit Shortcut Tool" : {
+
     },
     "Edit Template" : {
       "comment" : "Chat Template Editor Title",
@@ -5267,6 +5282,9 @@
         }
       }
     },
+    "Explain what this shortcut does so the model can decide when to call it." : {
+
+    },
     "Export all memories as JSON file." : {
       "localizations" : {
         "en" : {
@@ -5795,6 +5813,9 @@
           }
         }
       }
+    },
+    "Failed to encode shortcut payload." : {
+
     },
     "Failed to export memories: %@" : {
       "localizations" : {
@@ -6342,6 +6363,9 @@
         }
       }
     },
+    "FlowDown Helper" : {
+
+    },
     "FlowDown will restart to apply the imported database." : {
       "localizations" : {
         "en" : {
@@ -6439,6 +6463,9 @@
           }
         }
       }
+    },
+    "Function Name" : {
+
     },
     "General" : {
       "localizations" : {
@@ -6727,6 +6754,9 @@
           }
         }
       }
+    },
+    "How this tool will be displayed to the model." : {
+
     },
     "https://" : {
       "shouldTranslate" : false
@@ -7774,6 +7804,9 @@
         }
       }
     },
+    "Invocation" : {
+
+    },
     "Join our Discord server." : {
       "localizations" : {
         "en" : {
@@ -7805,6 +7838,9 @@
           }
         }
       }
+    },
+    "JSON Schema" : {
+
     },
     "Keep Enabled" : {
       "localizations" : {
@@ -8400,6 +8436,9 @@
           }
         }
       }
+    },
+    "Manage user-defined shortcuts as model tools." : {
+
     },
     "Management" : {
       "localizations" : {
@@ -9232,6 +9271,9 @@
         }
       }
     },
+    "Name cannot be empty." : {
+
+    },
     "Name: %@" : {
       "localizations" : {
         "en" : {
@@ -9327,6 +9369,9 @@
           }
         }
       }
+    },
+    "New Shortcut Tool" : {
+
     },
     "Next Conversation" : {
       "localizations" : {
@@ -9905,6 +9950,9 @@
         }
       }
     },
+    "Open Shortcut" : {
+
+    },
     "Open Source Licenses" : {
       "localizations" : {
         "en" : {
@@ -10339,6 +10387,9 @@
           }
         }
       }
+    },
+    "Plan Vacation" : {
+
     },
     "Please add more details and expand on the following content to provide additional information and context." : {
       "localizations" : {
@@ -10916,6 +10967,9 @@
           }
         }
       }
+    },
+    "Provide a short, action oriented name such as “Plan Vacation”." : {
+
     },
     "Query Calendar" : {
       "localizations" : {
@@ -11659,6 +11713,9 @@
         }
       }
     },
+    "Save" : {
+
+    },
     "Save Image" : {
       "localizations" : {
         "en" : {
@@ -11675,6 +11732,9 @@
         }
       }
     },
+    "Save Shortcut Tool" : {
+
+    },
     "Save to Conversation" : {
       "localizations" : {
         "en" : {
@@ -11690,6 +11750,9 @@
           }
         }
       }
+    },
+    "Schema must be valid JSON." : {
+
     },
     "Scope: %@" : {
       "localizations" : {
@@ -12252,6 +12315,42 @@
         }
       }
     },
+    "Shortcut callback is missing required payload." : {
+
+    },
+    "Shortcut Description" : {
+
+    },
+    "Shortcut execution failed: %@" : {
+
+    },
+    "Shortcut execution was cancelled." : {
+
+    },
+    "Shortcut Name" : {
+
+    },
+    "Shortcut name cannot be empty." : {
+
+    },
+    "Shortcut reported an unknown error." : {
+
+    },
+    "Shortcut Tool" : {
+
+    },
+    "Shortcut tool arguments are invalid." : {
+
+    },
+    "Shortcut Tools" : {
+
+    },
+    "Shortcut Tools Settings" : {
+
+    },
+    "Shortcut: %@" : {
+
+    },
     "Shortcuts" : {
       "localizations" : {
         "en" : {
@@ -12264,6 +12363,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "快捷操作"
+          }
+        }
+      }
+    },
+    "Shortcuts callback received, preparing response…" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "接收到快捷指令返回"
           }
         }
       }
@@ -12698,6 +12808,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "省：%@"
+          }
+        }
+      }
+    },
+    "Status" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "状态"
           }
         }
       }
@@ -13204,6 +13324,9 @@
         }
       }
     },
+    "Sync your configured Shortcut Tools." : {
+
+    },
     "Syncing Scope" : {
       "localizations" : {
         "en" : {
@@ -13632,6 +13755,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "推理端点需要写入完整的路径才能工作。路径通常是 /v1/chat/completions。"
+          }
+        }
+      }
+    },
+    "The exact name of the shortcut inside the Shortcuts app." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "“快捷指令”App中的名字。"
           }
         }
       }
@@ -14372,6 +14505,16 @@
         }
       }
     },
+    "This shortcut tool is disabled." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "该快捷指令被经用"
+          }
+        }
+      }
+    },
     "This summary is provided automatically according to the user's proactive memory setting, even when memory tools are disabled." : {
       "localizations" : {
         "en" : {
@@ -15063,6 +15206,16 @@
         }
       }
     },
+    "Unable to construct a valid Shortcuts URL." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "未能构建合法的“快捷指令” URL"
+          }
+        }
+      }
+    },
     "Unable to construct URL." : {
       "localizations" : {
         "en" : {
@@ -15091,6 +15244,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "无法打开这张图片。"
+          }
+        }
+      }
+    },
+    "Unable to decode shortcut callback payload." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "未能解码Callback内容"
           }
         }
       }
@@ -15128,7 +15291,14 @@
       }
     },
     "Unable to decode tool parameters." : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "未能解码工具调用参数"
+          }
+        }
+      }
     },
     "Unable to Determine" : {
       "localizations" : {
@@ -15227,7 +15397,14 @@
       }
     },
     "Unable to locate the tool message in this session." : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "定位工具消息失败。"
+          }
+        }
+      }
     },
     "Unable to open link." : {
       "localizations" : {
@@ -15241,6 +15418,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "无法打开链接。"
+          }
+        }
+      }
+    },
+    "Unable to open Shortcuts app." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "打开“快捷指令”失败"
           }
         }
       }
@@ -15289,6 +15476,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "无法处理工具调用：%@"
+          }
+        }
+      }
+    },
+    "Unable to Save" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "保存失败"
           }
         }
       }
@@ -15545,6 +15742,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "不支持"
+          }
+        }
+      }
+    },
+    "Unsupported callback scheme." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "不支持的Callback格式"
           }
         }
       }
@@ -15837,6 +16044,16 @@
         }
       }
     },
+    "Use the same casing and spacing as in the Shortcuts app." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "请使用和在“快捷指令”App中一样的大小写和空格"
+          }
+        }
+      }
+    },
     "Use the selected model to classify the image" : {
       "localizations" : {
         "en" : {
@@ -15868,6 +16085,9 @@
           }
         }
       }
+    },
+    "Use the Shortcut Tools page to create custom tool schemas or open flowdown://addShortcutTools? links to import drafts automatically." : {
+
     },
     "Use Tool" : {
       "localizations" : {
@@ -16174,7 +16394,14 @@
       }
     },
     "View Details" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "查看详情"
+          }
+        }
+      }
     },
     "View Logs" : {
       "localizations" : {
@@ -16252,6 +16479,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "视觉模型可被用于识别图像信息"
+          }
+        }
+      }
+    },
+    "Waiting for Shortcuts callback…" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "等待快捷指令运行完成…"
           }
         }
       }
@@ -16909,6 +17146,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "你是否希望将新的工作组应用到全部模型上？这要求推理端点与旧工作组和当前编辑的内容一致。"
+          }
+        }
+      }
+    },
+    "Would you like to open iCloud to download this shortcut?" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "你想打开iCloud来安装这个快捷指令吗"
           }
         }
       }

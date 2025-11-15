@@ -123,6 +123,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let host = url.host(), !host.isEmpty else { return }
         switch host {
         case "new": handleNewMessageURL(url)
+        case "shortcut": handleShortcutCallback(url)
+        case "addShortcutTools": handleAddShortcutToolURL(url)
         default: break
         }
     }
@@ -135,6 +137,70 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         mainController.queueNewConversation(text: message, shouldSend: !message.isEmpty)
     }
 
+    private func handleShortcutCallback(_ url: URL) {
+        ShortcutToolsManager.shared.handleCallbackURL(url)
+    }
+
+    private func handleAddShortcutToolURL(_ url: URL) {
+        guard let components = URLComponents(url: url, resolvingAgainstBaseURL: false) else { return }
+        var draft = ShortcutToolDraft.empty
+        var icloudURLString: String?
+        draft.isEnabled = true
+        if let items = components.queryItems {
+            for item in items {
+                guard let value = item.value else { continue }
+                switch item.name.lowercased() {
+                case "name":
+                    draft.name = value
+                case "description":
+                    draft.detail = value
+                case "shortcut", "shortcutname":
+                    draft.shortcutName = value
+                case "schema":
+                    draft.schemaJSON = value
+                case "enabled":
+                    draft.isEnabled = (value as NSString).boolValue
+                case "icloudurl":
+                    icloudURLString = value
+                default:
+                    continue
+                }
+            }
+        }
+        if
+            let icloudURLString,
+            !icloudURLString.isEmpty,
+            let shortcutURL = URL(string: icloudURLString)
+        {
+            Task { @MainActor [weak self] in
+                guard let self else { return }
+                let alert = UIAlertController(
+                    title: String(localized: "Open Shortcut"),
+                    message: String(localized: "Would you like to open iCloud to download this shortcut?"),
+                    preferredStyle: .alert
+                )
+                alert.addAction(UIAlertAction(title: String(localized: "Cancel"), style: .cancel))
+                alert.addAction(UIAlertAction(title: String(localized: "Open"), style: .default) { _ in
+                    UIApplication.shared.open(shortcutURL)
+                })
+                presentFromTop(alert)
+            }
+        }
+        ShortcutToolsManager.shared.queueExternalDraft(draft)
+        Task { @MainActor [weak self] in
+            guard let self else { return }
+            SettingController.setNextEntryPage(.shortcutTools)
+            let controller = SettingController()
+            if mainController.presentedViewController == nil {
+                mainController.present(controller, animated: true)
+            } else {
+                mainController.dismiss(animated: true) {
+                    self.mainController.present(controller, animated: true)
+                }
+            }
+        }
+    }
+
     func sceneDidDisconnect(_: UIScene) {}
 
     func sceneDidBecomeActive(_: UIScene) {}
@@ -144,4 +210,14 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     func sceneWillEnterForeground(_: UIScene) {}
 
     func sceneDidEnterBackground(_: UIScene) {}
+
+    @MainActor
+    private func presentFromTop(_ controller: UIViewController) {
+        guard let root = window?.rootViewController else { return }
+        var presenter = root
+        while let presented = presenter.presentedViewController {
+            presenter = presented
+        }
+        presenter.present(controller, animated: true)
+    }
 }

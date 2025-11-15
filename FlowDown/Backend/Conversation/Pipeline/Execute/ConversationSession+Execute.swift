@@ -229,7 +229,8 @@ extension ConversationSession {
 
         var tools: [ModelTool] = []
         if modelWillExecuteTools {
-            await tools.append(contentsOf: ModelToolsManager.shared.getEnabledToolsIncludeMCP())
+            let enabledTools = await ModelToolsManager.shared.getEnabledToolsIncludeMCPAndShortcut()
+            tools.append(contentsOf: enabledTools)
             if !modelWillGoSearchWeb {
                 // remove this tool if not enabled
                 tools = tools.filter { !($0 is MTWebSearchTool) }

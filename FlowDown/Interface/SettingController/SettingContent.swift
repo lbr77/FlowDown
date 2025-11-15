@@ -179,6 +179,8 @@ extension SettingController.EntryPage {
             return SettingController.SettingContent.ModelController()
         case .tools:
             return SettingController.SettingContent.ToolsController()
+        case .shortcutTools:
+            return SettingController.SettingContent.ShortcutToolsController()
         case .mcp:
             return SettingController.SettingContent.MCPController()
         case .memory:

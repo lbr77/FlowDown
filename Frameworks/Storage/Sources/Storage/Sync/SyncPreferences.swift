@@ -17,6 +17,7 @@ public enum SyncPreferences {
     private static let groupMemoryKey = "com.flowdown.storage.sync.group.memory"
     private static let groupMCPKey = "com.flowdown.storage.sync.group.mcp"
     private static let groupModelsKey = "com.flowdown.storage.sync.group.models"
+    private static let groupShortcutKey = "com.flowdown.storage.sync.group.shortcut"
 
     // MARK: - Manual Mode
 
@@ -32,6 +33,7 @@ public enum SyncPreferences {
         case memory // Memory
         case mcp // ModelContextServer
         case models // CloudModel
+        case shortcut // ShortcutTool
     }
 
     public static func isGroupEnabled(_ group: Group) -> Bool {
@@ -44,6 +46,8 @@ public enum SyncPreferences {
             UserDefaults.standard.object(forKey: groupMCPKey) as? Bool ?? true
         case .models:
             UserDefaults.standard.object(forKey: groupModelsKey) as? Bool ?? true
+        case .shortcut:
+            UserDefaults.standard.object(forKey: groupShortcutKey) as? Bool ?? true
         }
     }
 
@@ -53,6 +57,7 @@ public enum SyncPreferences {
         case .memory: groupMemoryKey
         case .mcp: groupMCPKey
         case .models: groupModelsKey
+        case .shortcut: groupShortcutKey
         }
         UserDefaults.standard.set(enabled, forKey: key)
     }
@@ -68,6 +73,8 @@ public enum SyncPreferences {
             .mcp
         case CloudModel.tableName:
             .models
+        case ShortcutTool.tableName:
+            .shortcut
         default:
             nil
         }
@@ -100,6 +107,10 @@ public enum SyncPreferences {
 
         if SyncPreferences.isGroupEnabled(.mcp) {
             tables.append(ModelContextServer.tableName)
+        }
+
+        if SyncPreferences.isGroupEnabled(.shortcut) {
+            tables.append(ShortcutTool.tableName)
         }
 
         return tables

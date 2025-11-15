@@ -28,6 +28,8 @@ package struct SyncQueryProperties {
             Message.SyncQuery.objectId
         case Attachment.tableName:
             Attachment.SyncQuery.objectId
+        case ShortcutTool.tableName:
+            ShortcutTool.SyncQuery.objectId
         default:
             WCDBSwift.Property(named: "objectId", with: nil)
         }
@@ -47,6 +49,8 @@ package struct SyncQueryProperties {
             Message.SyncQuery.creation
         case Attachment.tableName:
             Attachment.SyncQuery.creation
+        case ShortcutTool.tableName:
+            ShortcutTool.SyncQuery.creation
         default:
             WCDBSwift.Property(named: "creation", with: nil)
         }
@@ -66,6 +70,8 @@ package struct SyncQueryProperties {
             Message.SyncQuery.modified
         case Attachment.tableName:
             Attachment.SyncQuery.modified
+        case ShortcutTool.tableName:
+            ShortcutTool.SyncQuery.modified
         default:
             WCDBSwift.Property(named: "modified", with: nil)
         }
@@ -85,6 +91,8 @@ package struct SyncQueryProperties {
             Message.SyncQuery.removed
         case Attachment.tableName:
             Attachment.SyncQuery.removed
+        case ShortcutTool.tableName:
+            ShortcutTool.SyncQuery.removed
         default:
             WCDBSwift.Property(named: "removed", with: nil)
         }

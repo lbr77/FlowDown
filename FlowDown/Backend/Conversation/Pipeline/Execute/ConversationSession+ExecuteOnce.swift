@@ -5,9 +5,12 @@
 //  Created by 秋星桥 on 3/19/25.
 //
 
+import AlertController
 import ChatClientKit
+import Combine
 import Foundation
 import Storage
+import UIKit
 import UniformTypeIdentifiers
 
 extension ConversationSession {
@@ -110,7 +113,8 @@ extension ConversationSession {
         for request in pendingToolCalls {
             guard let tool = await ModelToolsManager.shared.findTool(for: request) else {
                 Logger.chatService.errorFile("unable to find tool for request: \(request)")
-                await Logger.chatService.infoFile("available tools: \(ModelToolsManager.shared.getEnabledToolsIncludeMCP())")
+                let availableTools = await ModelToolsManager.shared.getEnabledToolsIncludeMCPAndShortcut()
+                await Logger.chatService.infoFile("available tools: \(availableTools)")
                 throw NSError(
                     domain: "Tool Error",
                     code: -1,
@@ -170,12 +174,102 @@ extension ConversationSession {
                 encodeToolRequestAndAttachToToolMessage(request, message: toolMessage)
                 await requestUpdate(view: currentMessageListView)
 
+                let isShortcutInvocation = tool is ShortcutModelTool
+                let shortcutToolName = tool.interfaceName
+                var invocationContextID: String? = request.id.uuidString
+                var shortcutLoadingToken: UUID?
+                var shortcutLoadingReleased = false
+                var shortcutIndicator: AlertProgressIndicatorViewController?
+                var shortcutIndicatorDismissed = false
+                func presentShortcutIndicatorIfNeeded(title: String.LocalizationValue) {
+                    guard shortcutIndicator == nil, !shortcutIndicatorDismissed else { return }
+                    Task { @MainActor in
+                        guard let controller = currentMessageListView.parentViewController else { return }
+                        guard controller.presentedViewController == nil else { return }
+                        let indicator = AlertProgressIndicatorViewController(title: title)
+                        controller.present(indicator, animated: true)
+                        shortcutIndicator = indicator
+                    }
+                }
+                func dismissShortcutIndicatorIfNeeded() {
+                    guard !shortcutIndicatorDismissed else { return }
+                    shortcutIndicatorDismissed = true
+                    Task { @MainActor in
+                        if let indicator = shortcutIndicator {
+                            indicator.dismiss(animated: true)
+                        }
+                        shortcutIndicator = nil
+                    }
+                }
+                if isShortcutInvocation {
+                    let waitingForShortcutTitle: String.LocalizationValue = "Waiting for Shortcuts callback…"
+                    let waitingForShortcutMessage = String(localized: waitingForShortcutTitle)
+                    let shortcutCompletedMessage = String(localized: "Tool call for \(shortcutToolName) completed.")
+                    shortcutLoadingToken = await currentMessageListView.beginPersistentLoading(with: waitingForShortcutMessage)
+                    shortcutCallbackCancellable?.cancel()
+                    shortcutCallbackCancellable = ShortcutToolsManager.shared.invocationEvents
+                        .filter { $0.contextID == invocationContextID }
+                        .sink { [weak self, weak toolMessage, weak currentMessageListView] event in
+                            guard let self, let toolMessage, let currentMessageListView else { return }
+                            var status = toolMessage.toolStatus ?? Message.ToolStatus(name: event.toolName, state: 0, message: "")
+                            switch event.state {
+                            case .waiting:
+                                status.state = 0
+                                status.message = waitingForShortcutMessage
+                                presentShortcutIndicatorIfNeeded(title: waitingForShortcutTitle)
+                            case let .completed(result):
+                                switch result {
+                                case .success:
+                                    status.state = 1
+                                    status.message = shortcutCompletedMessage
+                                    dismissShortcutIndicatorIfNeeded()
+                                case let .failure(error):
+                                    status.state = 2
+                                    status.message = error.localizedDescription
+                                    dismissShortcutIndicatorIfNeeded()
+                                }
+                            }
+                            toolMessage.update(\.toolStatus, to: status)
+                            Task { @MainActor [weak self, weak currentMessageListView] in
+                                guard let self, let currentMessageListView else { return }
+                                await requestUpdate(view: currentMessageListView)
+                                if let token = shortcutLoadingToken {
+                                    switch event.state {
+                                    case .waiting:
+                                        await currentMessageListView.updatePersistentLoading(token: token, message: waitingForShortcutMessage)
+                                    case .completed:
+                                        await currentMessageListView.endPersistentLoading(token: token)
+                                        shortcutLoadingReleased = true
+                                    }
+                                }
+                            }
+                        }
+                }
+
                 // 标准工具
                 do {
+                    defer {
+                        if isShortcutInvocation {
+                            shortcutCallbackCancellable?.cancel()
+                            shortcutCallbackCancellable = nil
+                            if let token = shortcutLoadingToken {
+                                Task { @MainActor [weak currentMessageListView] in
+                                    guard let currentMessageListView else { return }
+                                    if !shortcutLoadingReleased {
+                                        await currentMessageListView.endPersistentLoading(token: token)
+                                        shortcutLoadingReleased = true
+                                    }
+                                }
+                            }
+                            dismissShortcutIndicatorIfNeeded()
+                        }
+                    }
+
                     let result = try await ModelToolsManager.shared.perform(
                         withTool: tool,
                         parms: request.args,
-                        anchorTo: currentMessageListView
+                        anchorTo: currentMessageListView,
+                        contextID: invocationContextID
                     )
                     var toolResponseText = result.text
 

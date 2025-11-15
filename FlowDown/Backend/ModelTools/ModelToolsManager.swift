@@ -92,8 +92,12 @@ class ModelToolsManager {
         }
     }
 
-    func getEnabledToolsIncludeMCP() async -> [ModelTool] {
+    func getEnabledToolsIncludeMCPAndShortcut() async -> [ModelTool] {
         var result = enabledTools
+        let shortcutTools = ShortcutToolsManager.shared
+            .listModelTools()
+            .filter(\.isEnabled)
+        result.append(contentsOf: shortcutTools)
         let mcpTools = await MCPService.shared.listServerTools()
         result.append(contentsOf: mcpTools.filter(\.isEnabled))
         return result
@@ -120,7 +124,7 @@ class ModelToolsManager {
 
     func findTool(for request: ToolCallRequest) async -> ModelTool? {
         Logger.model.debugFile("finding tool call with function name \(request.name)")
-        let allTools = await getEnabledToolsIncludeMCP()
+        let allTools = await getEnabledToolsIncludeMCPAndShortcut()
         return allTools.first {
             $0.functionName.lowercased() == request.name.lowercased()
         }
@@ -139,9 +143,9 @@ class ModelToolsManager {
         let audioAttachments: [Attachment]
     }
 
-    func perform(withTool tool: ModelTool, parms: String, anchorTo view: UIView) async throws -> ToolResultContents {
+    func perform(withTool tool: ModelTool, parms: String, anchorTo view: UIView, contextID: String? = nil) async throws -> ToolResultContents {
         if Self.skipConfirmationValue {
-            let ans = try await tool.execute(with: parms, anchorTo: view)
+            let ans = try await tool.execute(with: parms, anchorTo: view, contextID: contextID)
             return processToolResult(ans)
         } else {
             return try await withCheckedThrowingContinuation { continuation in
@@ -163,7 +167,7 @@ class ModelToolsManager {
                             context.dispose {
                                 Task.detached(priority: .userInitiated) {
                                     do {
-                                        let ans = try await tool.execute(with: parms, anchorTo: view)
+                                        let ans = try await tool.execute(with: parms, anchorTo: view, contextID: contextID)
                                         let result = self.processToolResult(ans)
                                         continuation.resume(returning: result)
                                     } catch {

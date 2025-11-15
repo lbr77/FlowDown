@@ -59,7 +59,7 @@ extension ConversationSession {
             )
 
             // Add memory tools guidance if memory tools are enabled
-            let memoryToolsEnabled = await ModelToolsManager.shared.getEnabledToolsIncludeMCP().contains { tool in
+            let memoryToolsEnabled = await ModelToolsManager.shared.getEnabledToolsIncludeMCPAndShortcut().contains { tool in
                 tool is MTStoreMemoryTool || tool is MTRecallMemoryTool ||
                     tool is MTListMemoriesTool || tool is MTUpdateMemoryTool ||
                     tool is MTDeleteMemoryTool

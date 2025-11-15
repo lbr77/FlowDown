@@ -61,6 +61,19 @@ public final class MemoryNotificationInfo: Sendable {
     }
 }
 
+public final class ShortcutToolNotificationInfo: Sendable {
+    public let modifications: [ShortcutTool.ID]
+    public let deletions: [ShortcutTool.ID]
+    public var isEmpty: Bool {
+        modifications.isEmpty && deletions.isEmpty
+    }
+
+    public init(modifications: [ShortcutTool.ID], deletions: [ShortcutTool.ID]) {
+        self.modifications = modifications
+        self.deletions = deletions
+    }
+}
+
 public final class MessageNotificationInfo: Sendable {
     public let modifications: [Conversation.ID: [Message.ID]]
     public let deletions: [Conversation.ID: [Message.ID]]
@@ -85,6 +98,8 @@ public final actor SyncEngine: Sendable {
     public static let ModelContextServerChanged: Notification.Name = .init("wiki.qaq.flowdown.SyncEngine.ModelContextServerChanged")
     /// 记忆列表变化通知, 在 MainActor 中发布。可安全的在UI线程中访问
     public static let MemoryChanged: Notification.Name = .init("wiki.qaq.flowdown.SyncEngine.MemoryChanged")
+    /// Shortcut Tool 列表变化通知, 在 MainActor 中发布。可安全的在UI线程中访问
+    public static let ShortcutToolChanged: Notification.Name = .init("wiki.qaq.flowdown.SyncEngine.ShortcutToolChanged")
     /// 本地数据删除通知, 在 MainActor 中发布。可安全的在UI线程中访问
     public static let LocalDataDeleted: Notification.Name = .init("wiki.qaq.flowdown.SyncEngine.LocalDataDeleted")
     /// 云端数据删除通知, 在 MainActor 中发布。可安全的在UI线程中访问
@@ -96,6 +111,7 @@ public final actor SyncEngine: Sendable {
     public static let CloudModelNotificationKey: String = "CloudModel"
     public static let ModelContextServerNotificationKey: String = "ModelContextServer"
     public static let MemoryNotificationKey: String = "Memory"
+    public static let ShortcutToolNotificationKey: String = "ShortcutTool"
 
     public nonisolated static let syncEnabledDefaultsKey = "com.flowdown.storage.sync.manually.enabled"
 
@@ -665,6 +681,7 @@ private extension SyncEngine {
         var modificationCloudModels: [CloudModel.ID] = []
         var modificationMCPS: [ModelContextServer.ID] = []
         var modificationMemorys: [Memory.ID] = []
+        var modificationShortcutTools: [ShortcutTool.ID] = []
 
         for modification in filteredModifications {
             let recordID = modification.recordID
@@ -679,6 +696,8 @@ private extension SyncEngine {
                 modificationMCPS.append(objectId)
             } else if tableName == Memory.tableName {
                 modificationMemorys.append(objectId)
+            } else if tableName == ShortcutTool.tableName {
+                modificationShortcutTools.append(objectId)
             }
         }
 
@@ -687,6 +706,7 @@ private extension SyncEngine {
         var deletedCloudModels: [CloudModel.ID] = []
         var deletedMCPS: [ModelContextServer.ID] = []
         var deletedMemorys: [Memory.ID] = []
+        var deletedShortcutTools: [ShortcutTool.ID] = []
         for deletion in filteredDeletions {
             let recordID = deletion.recordID
             guard let (objectId, tableName) = UploadQueue.parseCKRecordID(recordID.recordName) else { continue }
@@ -700,6 +720,8 @@ private extension SyncEngine {
                 deletedMCPS.append(objectId)
             } else if tableName == Memory.tableName {
                 deletedMemorys.append(objectId)
+            } else if tableName == ShortcutTool.tableName {
+                deletedShortcutTools.append(objectId)
             }
         }
 
@@ -718,6 +740,7 @@ private extension SyncEngine {
         let cloudModelNotificationInfo = CloudModelNotificationInfo(modifications: modificationCloudModels, deletions: deletedCloudModels)
         let MCPNotificationInfo = ModelContextServerNotificationInfo(modifications: modificationMCPS, deletions: deletedMCPS)
         let memoryNotificationInfo = MemoryNotificationInfo(modifications: modificationMemorys, deletions: deletedMemorys)
+        let shortcutToolNotificationInfo = ShortcutToolNotificationInfo(modifications: modificationShortcutTools, deletions: deletedShortcutTools)
 
         await MainActor.run {
             if !conversationNotificationInfo.isEmpty {
@@ -765,7 +788,17 @@ private extension SyncEngine {
                     name: SyncEngine.MemoryChanged,
                     object: nil,
                     userInfo: [
-                        SyncEngine.MemoryNotificationKey: MCPNotificationInfo,
+                        SyncEngine.MemoryNotificationKey: memoryNotificationInfo,
+                    ]
+                )
+            }
+
+            if !shortcutToolNotificationInfo.isEmpty {
+                NotificationCenter.default.post(
+                    name: SyncEngine.ShortcutToolChanged,
+                    object: nil,
+                    userInfo: [
+                        SyncEngine.ShortcutToolNotificationKey: shortcutToolNotificationInfo,
                     ]
                 )
             }

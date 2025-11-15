@@ -5,6 +5,7 @@
 
 import AlertController
 import Combine
+import Foundation
 import ListViewKit
 import Litext
 import MarkdownView
@@ -55,6 +56,8 @@ final class MessageListView: UIView {
     private var viewCancellables: Set<AnyCancellable> = .init()
     private var sessionScopedCancellables: Set<AnyCancellable> = .init()
     private let loadingIndicatorPublisher = CurrentValueSubject<String?, Never>(nil)
+    private var persistentLoadingStack: [(token: UUID, message: String)] = []
+    private var transientLoadingMessage: String?
 
     var contentSafeAreaInsets: UIEdgeInsets = .zero {
         didSet {
@@ -137,12 +140,44 @@ final class MessageListView: UIView {
         return abs(listView.contentOffset.y - listView.maximumContentOffset.y) <= tolerance
     }
 
+    @MainActor
     func loading(with message: String = .init()) {
-        loadingIndicatorPublisher.send(message)
+        transientLoadingMessage = message
+        refreshLoadingIndicator()
     }
 
+    @MainActor
     func stopLoading() {
-        loadingIndicatorPublisher.send(nil)
+        transientLoadingMessage = nil
+        refreshLoadingIndicator()
+    }
+
+    @discardableResult
+    @MainActor
+    func beginPersistentLoading(with message: String) -> UUID {
+        let token = UUID()
+        persistentLoadingStack.append((token: token, message: message))
+        refreshLoadingIndicator()
+        return token
+    }
+
+    @MainActor
+    func updatePersistentLoading(token: UUID, message: String) {
+        guard let index = persistentLoadingStack.firstIndex(where: { $0.token == token }) else { return }
+        persistentLoadingStack[index].message = message
+        refreshLoadingIndicator()
+    }
+
+    @MainActor
+    func endPersistentLoading(token: UUID) {
+        persistentLoadingStack.removeAll { $0.token == token }
+        refreshLoadingIndicator()
+    }
+
+    @MainActor
+    private func refreshLoadingIndicator() {
+        let message = persistentLoadingStack.last?.message ?? transientLoadingMessage
+        loadingIndicatorPublisher.send(message)
     }
 
     func handleLinkTapped(_ link: LinkPayload, in _: NSRange, at point: CGPoint) {

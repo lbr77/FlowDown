@@ -112,6 +112,29 @@ extension SettingController.SettingContent {
 
             stackView.addArrangedSubviewWithMargin(
                 ConfigurableSectionHeaderView().with(
+                    header: "Shortcut Tools"
+                )
+            ) { $0.bottom /= 2 }
+            stackView.addArrangedSubview(SeparatorView())
+
+            let shortcutToolsObject = ConfigurableObject(
+                icon: "bolt.square.fill",
+                title: "Shortcut Tools",
+                explain: "Manage user-defined shortcuts as model tools.",
+                ephemeralAnnotation: .page { SettingController.SettingContent.ShortcutToolsController() }
+            )
+            stackView.addArrangedSubviewWithMargin(shortcutToolsObject.createView())
+            stackView.addArrangedSubview(SeparatorView())
+
+            stackView.addArrangedSubviewWithMargin(
+                ConfigurableSectionFooterView().with(
+                    footer: "Use the Shortcut Tools page to create custom tool schemas or open flowdown://addShortcutTools? links to import drafts automatically."
+                )
+            ) { $0.top /= 2 }
+            stackView.addArrangedSubview(SeparatorView())
+
+            stackView.addArrangedSubviewWithMargin(
+                ConfigurableSectionHeaderView().with(
                     header: "Automation"
                 )
             ) { $0.bottom /= 2 }
