@@ -30,9 +30,8 @@ public final class LogStore: @unchecked Sendable {
         logFileName = fileName
         self.queue = queue ?? DispatchQueue(label: "wiki.qaq.flowdown.logstore", qos: .utility)
 
-        let base = directory ?? fileManager.urls(for: .cachesDirectory, in: .userDomainMask).first
-            ?? URL(fileURLWithPath: NSTemporaryDirectory())
-        let dir = base.appendingPathComponent("Logs", isDirectory: true)
+        let base = directory ?? Self.defaultBaseDirectory(fileManager: fileManager)
+        let dir = Self.logDirectory(baseDirectory: base)
         try? fileManager.createDirectory(at: dir, withIntermediateDirectories: true)
         logDirectory = dir
     }
@@ -73,13 +72,20 @@ public final class LogStore: @unchecked Sendable {
 
     public func clear() {
         queue.sync {
-            try? fileManager.removeItem(at: logFileURL)
-            removeRotatedFiles()
+            removeCurrentLogs()
         }
     }
 
     public func flush() {
         queue.sync {}
+    }
+
+    public func clearLegacyCacheDirectory() {
+        queue.sync {
+            guard let legacyDirectory = Self.legacyCacheLogDirectory(fileManager: fileManager) else { return }
+            guard legacyDirectory.standardizedFileURL != logDirectory.standardizedFileURL else { return }
+            removeLogDirectory(at: legacyDirectory)
+        }
     }
 
     private func formattedLine(level: LogLevel, category: String, message: String) -> Data {
@@ -126,5 +132,30 @@ public final class LogStore: @unchecked Sendable {
         for index in 1 ... maxFiles {
             try? fileManager.removeItem(at: rotatedFileURL(index: index))
         }
+    }
+
+    func removeCurrentLogs() {
+        try? fileManager.removeItem(at: logFileURL)
+        removeRotatedFiles()
+    }
+
+    func removeLogDirectory(at directory: URL) {
+        try? fileManager.removeItem(at: directory)
+    }
+
+    static func defaultBaseDirectory(fileManager: FileManager) -> URL {
+        fileManager.urls(for: .documentDirectory, in: .userDomainMask).first
+            ?? URL(fileURLWithPath: NSTemporaryDirectory())
+    }
+
+    static func legacyCacheLogDirectory(fileManager: FileManager) -> URL? {
+        guard let base = fileManager.urls(for: .cachesDirectory, in: .userDomainMask).first else {
+            return nil
+        }
+        return logDirectory(baseDirectory: base)
+    }
+
+    static func logDirectory(baseDirectory: URL) -> URL {
+        baseDirectory.appendingPathComponent("Logs", isDirectory: true)
     }
 }

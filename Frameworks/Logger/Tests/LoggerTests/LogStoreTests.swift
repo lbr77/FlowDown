@@ -4,6 +4,25 @@ import Testing
 
 struct LogStoreTests {
     @Test
+    func `default base directory resolves to documents directory`() {
+        let expected = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first
+            ?? URL(fileURLWithPath: NSTemporaryDirectory())
+
+        let resolved = LogStore.defaultBaseDirectory(fileManager: .default)
+
+        #expect(resolved.standardizedFileURL == expected.standardizedFileURL)
+    }
+
+    @Test
+    func `log directory helper appends Logs folder to base directory`() {
+        let base = URL(filePath: "/tmp/flowdown-log-tests", directoryHint: .isDirectory)
+
+        let resolved = LogStore.logDirectory(baseDirectory: base)
+
+        #expect(resolved.path == "/tmp/flowdown-log-tests/Logs")
+    }
+
+    @Test
     func `append writes formatted line and readTail returns it`() throws {
         let (store, directory) = try makeStore()
         defer { try? FileManager.default.removeItem(at: directory) }
@@ -106,6 +125,24 @@ struct LogStoreTests {
 
         let contents = (try? FileManager.default.contentsOfDirectory(at: store.logDirectory, includingPropertiesForKeys: nil)) ?? []
         #expect(contents.isEmpty)
+    }
+
+    @Test
+    func `removeLogDirectory deletes an entire legacy log directory`() throws {
+        let (store, directory) = try makeStore()
+        defer { try? FileManager.default.removeItem(at: directory) }
+
+        let legacyBase = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
+        let legacyDirectory = LogStore.logDirectory(baseDirectory: legacyBase)
+        try FileManager.default.createDirectory(at: legacyDirectory, withIntermediateDirectories: true)
+        FileManager.default.createFile(
+            atPath: legacyDirectory.appendingPathComponent("FlowDown.log").path,
+            contents: Data("legacy".utf8),
+        )
+
+        store.removeLogDirectory(at: legacyDirectory)
+
+        #expect(!FileManager.default.fileExists(atPath: legacyDirectory.path))
     }
 
     @Test

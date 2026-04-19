@@ -9,6 +9,7 @@ import AlertController
 import Combine
 import ConfigurableKit
 import Digger
+import Logger
 import Storage
 import UIKit
 import UniformTypeIdentifiers
@@ -224,6 +225,8 @@ extension SettingController.SettingContent {
                         context.addAction(title: "Clear", attribute: .accent) {
                             DiggerCache.cleanDownloadFiles()
                             DiggerCache.cleanDownloadTempFiles()
+                            LogStore.shared.clear()
+                            LogStore.shared.clearLegacyCacheDirectory()
                             Indicator.present(
                                 title: "Cleaned",
                                 referencingView: controller.view,

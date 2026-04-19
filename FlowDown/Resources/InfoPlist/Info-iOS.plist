@@ -149,6 +149,8 @@
 		<string>audio</string>
 		<string>remote-notification</string>
 	</array>
+	<key>UIFileSharingEnabled</key>
+	<true/>
 	<key>UISceneConfigurations</key>
 	<dict>
 		<key>UIWindowSceneSessionRoleApplication</key>
