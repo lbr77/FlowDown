@@ -102,6 +102,7 @@ extension RewriteAction {
             let stream = try await ModelManager.shared.streamingInfer(
                 with: model,
                 input: messageBody,
+                requestSessionID: session.id,
             )
 
             var rewritten = ""

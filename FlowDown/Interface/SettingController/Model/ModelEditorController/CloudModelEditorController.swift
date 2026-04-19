@@ -50,6 +50,14 @@ class CloudModelEditorController: StackScrollController {
                 }
             }
             .store(in: &cancellables)
+
+        NotificationCenter.default.publisher(for: .openAIOAuthCredentialsDidChange)
+            .ensureMainThread()
+            .sink { [weak self] _ in
+                guard let self, isVisible else { return }
+                rerenderContent()
+            }
+            .store(in: &cancellables)
     }
 
     override func setupContentViews() {
@@ -59,6 +67,31 @@ class CloudModelEditorController: StackScrollController {
 
     @objc func checkTapped() {
         navigationController?.popViewController()
+    }
+
+    func rerenderContent() {
+        stackView.arrangedSubviews.forEach { $0.removeFromSuperview() }
+        responseFormatInfoView = nil
+        setupContentViews()
+        applySeparatorConstraints()
+    }
+
+    func applySeparatorConstraints() {
+        stackView
+            .subviews
+            .compactMap { view -> SeparatorView? in
+                if view is SeparatorView {
+                    return view as? SeparatorView
+                }
+                return nil
+            }
+            .forEach {
+                $0.translatesAutoresizingMaskIntoConstraints = false
+                NSLayoutConstraint.activate([
+                    $0.heightAnchor.constraint(equalToConstant: 1),
+                    $0.widthAnchor.constraint(equalTo: stackView.widthAnchor),
+                ])
+            }
     }
 }
 

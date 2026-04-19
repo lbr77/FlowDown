@@ -18,9 +18,42 @@ struct ModelScopeTests {
                 fromEndpoint: "https://api.example.com/responses/",
             ) == .responses,
         )
+        #expect(
+            CloudModel.ResponseFormat.inferredFormat(
+                fromEndpoint: "https://chatgpt.com/backend-api/codex/?query=1",
+            ) == .codex,
+        )
+        #expect(
+            CloudModel.ResponseFormat.inferredFormat(
+                fromEndpoint: "https://chatgpt.com/backend-api/codex/responses?query=1",
+            ) == .codex,
+        )
+        #expect(
+            CloudModel.isOpenAICodexOAuthEndpoint(
+                " HTTPS://CHATGPT.COM/backend-api/codex/?query=1#fragment ",
+            ),
+        )
+        #expect(
+            CloudModel.isOpenAICodexOAuthEndpoint(
+                " HTTPS://CHATGPT.COM/backend-api/codex/responses/?query=1#fragment ",
+            ),
+        )
+        #expect(
+            CloudModel.canonicalOpenAICodexOAuthEndpoint(
+                for: "https://chatgpt.com/backend-api/codex",
+            ) == CloudModel.openAICodexOAuthEndpoint,
+        )
+
+        let oauthModel = CloudModel(
+            deviceId: Storage.deviceId,
+            endpoint: "https://chatgpt.com/backend-api/codex",
+        )
+        #expect(oauthModel.usesAutomaticOpenAIOAuth)
+
         #expect(CloudModel.ResponseFormat.inferredFormat(fromEndpoint: "") == missingFormat)
         #expect(CloudModel.ResponseFormat.chatCompletions.defaultModelListEndpoint == "$INFERENCE_ENDPOINT$/../../models")
         #expect(CloudModel.ResponseFormat.responses.defaultModelListEndpoint == "$INFERENCE_ENDPOINT$/../models")
+        #expect(CloudModel.ResponseFormat.codex.defaultModelListEndpoint.isEmpty)
     }
 
     @Test

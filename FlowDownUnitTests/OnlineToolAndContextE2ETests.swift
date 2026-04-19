@@ -54,6 +54,8 @@ struct OnlineToolAndContextE2ETests {
             return try OnlineE2ETestSupport.makeCompletionsClient()
         case .responses:
             return try OnlineE2ETestSupport.makeResponsesClient()
+        case .codex:
+            return try OnlineE2ETestSupport.makeCodexClient()
         }
     }
 

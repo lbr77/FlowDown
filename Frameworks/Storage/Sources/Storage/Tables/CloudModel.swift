@@ -101,10 +101,7 @@ public final class CloudModel: Identifiable, Codable, Equatable, Hashable, Table
         creation: Date = .init(),
         endpoint: String = "",
         token: String = "",
-        headers: [String: String] = [
-            "HTTP-Referer": "https://flowdown.ai/",
-            "X-Title": "FlowDown",
-        ],
+        headers: [String: String] = [:],
         bodyFields: String = "",
         context: ModelContextLength = .medium_64k,
         capabilities: Set<ModelCapabilities> = [],
@@ -184,6 +181,7 @@ public extension CloudModel {
     enum ResponseFormat: String, CaseIterable, Codable {
         case chatCompletions
         case responses
+        case codex
 
         public static let `default`: CloudModel.ResponseFormat = .chatCompletions
     }

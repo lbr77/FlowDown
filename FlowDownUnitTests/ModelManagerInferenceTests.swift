@@ -21,7 +21,7 @@ struct ModelManagerInferenceTests {
                 tools: [],
             )
         })
-        manager.chatServiceFactory = { _, _ in service }
+        manager.chatServiceFactory = { _, _, _ in service }
 
         let response = try await manager.infer(
             with: "unit-test-model",
@@ -50,7 +50,7 @@ struct ModelManagerInferenceTests {
                 },
             )
         })
-        manager.chatServiceFactory = { _, _ in service }
+        manager.chatServiceFactory = { _, _, _ in service }
         manager.gpuSupportProvider = { true }
 
         let model = LocalModel(
@@ -73,5 +73,34 @@ struct ModelManagerInferenceTests {
         case .failure:
             Issue.record("Expected injected local model test to succeed")
         }
+    }
+
+    @Test
+    func `infer forwards request session id to injected chat service factory`() async throws {
+        let manager = ModelManager.shared
+        let originalFactory = manager.chatServiceFactory
+        defer { manager.chatServiceFactory = originalFactory }
+
+        let service = ChatServiceSpy(chatHandler: { _ in
+            ChatResponse(
+                reasoning: "",
+                text: "ok",
+                images: [],
+                tools: [],
+            )
+        })
+        var receivedSessionID: String?
+        manager.chatServiceFactory = { _, _, requestSessionID in
+            receivedSessionID = requestSessionID
+            return service
+        }
+
+        _ = try await manager.infer(
+            with: "unit-test-model",
+            input: [.user(content: .text("Ping"))],
+            requestSessionID: "conversation-123",
+        )
+
+        #expect(receivedSessionID == "conversation-123")
     }
 }

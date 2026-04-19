@@ -65,7 +65,7 @@ private extension CloudModelEditorController {
         stackView.addArrangedSubviewWithMargin(makeEndpointView(model: model))
         addSeparator()
 
-        stackView.addArrangedSubviewWithMargin(makeTokenView(model: model))
+        stackView.addArrangedSubviewWithMargin(makeAuthenticationView(model: model))
         addSeparator()
 
         stackView.addArrangedSubviewWithMargin(makeModelIdentifierView(model: model))
@@ -73,7 +73,7 @@ private extension CloudModelEditorController {
 
         addFooter(
             ConfigurableSectionFooterView()
-                .with(footer: "The endpoint needs to be written in full path to work. The path is usually /v1/chat/completions."),
+                .with(footer: "The endpoint needs to include the full request path. Common endings are /v1/chat/completions, /v1/responses, or /backend-api/codex/responses."),
         ) {
             $0.top /= 2
             $0.bottom = 0
@@ -206,6 +206,13 @@ private extension CloudModelEditorController {
         return view
     }
 
+    func makeAuthenticationView(model: CloudModel?) -> ConfigurableInfoView {
+        if model?.usesAutomaticOpenAIOAuth == true {
+            return makeOpenAIOAuthView(model: model)
+        }
+        return makeTokenView(model: model)
+    }
+
     func makeTokenView(model: CloudModel?) -> ConfigurableInfoView {
         let view = ConfigurableInfoView().setTapBlock { [weak self] view in
             guard let self,
@@ -214,9 +221,9 @@ private extension CloudModelEditorController {
 
             let oldToken = currentModel.token
             let input = AlertInputViewController(
-                title: "Edit Workgroup (Optional)",
-                message: "This value will be added to the request to distinguish the workgroup on the remote. This part is optional, if not used, leave it blank.",
-                placeholder: "\("xx-xxx")",
+                title: "Edit Bearer Token (Optional)",
+                message: "When provided, FlowDown sends this value as Authorization: Bearer <token>. Leave it empty when your endpoint uses custom headers or anonymous access.",
+                placeholder: "\("sk-...")",
                 text: currentModel.token,
             ) { [weak self] newToken in
                 guard let self else { return }
@@ -231,11 +238,11 @@ private extension CloudModelEditorController {
 
                 guard !affectedModels.isEmpty else { return }
                 let alert = AlertViewController(
-                    title: "Update All Models",
-                    message: "Would you like to apply the new workgroup to all? This requires the inference endpoint and the old workgroup equal to the current editing.",
+                    title: "Update Matching Models",
+                    message: "Would you like to apply the new bearer token to every model that currently shares this endpoint and token?",
                 ) { context in
                     context.addAction(title: "Cancel") { context.dispose() }
-                    context.addAction(title: "Update All", attribute: .accent) {
+                    context.addAction(title: "Update Matching", attribute: .accent) {
                         context.dispose {
                             for item in affectedModels {
                                 ModelManager.shared.editCloudModel(identifier: item.id) {
@@ -251,8 +258,8 @@ private extension CloudModelEditorController {
         }
 
         view.configure(icon: .init(systemName: "square"))
-        view.configure(title: "Workgroup (Optional)")
-        view.configure(description: "This value will be added to the request to distinguish the workgroup on the remote.")
+        view.configure(title: "Bearer Token (Optional)")
+        view.configure(description: "FlowDown sends this value as Authorization: Bearer <token> for every request.")
         let value = (model?.token.isEmpty ?? true) ? notAvailableText : configuredText
         view.configure(value: value)
         return view
@@ -427,15 +434,19 @@ private extension CloudModelEditorController {
     func makeResponseFormatView(model: CloudModel?) -> ConfigurableInfoView {
         let view = ConfigurableInfoView()
         responseFormatInfoView = view
+        let usesAutomaticOpenAIOAuth = model?.usesAutomaticOpenAIOAuth ?? false
 
         view.configure(icon: .init(systemName: "arrow.triangle.2.circlepath"))
         view.configure(title: "Content Format")
         view.configure(description: "Select which format this model should use when performing network requests.")
 
-        let currentFormat = model?.response_format ?? .default
+        let currentFormat: CloudModel.ResponseFormat = usesAutomaticOpenAIOAuth
+            ? .codex
+            : (model?.response_format ?? .default)
         view.configure(value: currentFormat.localizedTitle)
         view.use { [weak self, weak view] in
             guard let self, let view else { return [] }
+            guard usesAutomaticOpenAIOAuth == false else { return [] }
             let selected = ModelManager.shared.responseFormat(for: identifier)
             return CloudModel.ResponseFormat.allCases.map { format in
                 UIAction(

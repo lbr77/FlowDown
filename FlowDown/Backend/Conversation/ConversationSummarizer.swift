@@ -100,6 +100,7 @@ final class ConversationSummarizer {
                 with: modelId,
                 maxCompletionTokens: 256,
                 input: inferMessages,
+                requestSessionID: conversationId,
             )
 
             let raw = response.text.trimmingCharacters(in: .whitespacesAndNewlines)

@@ -1980,6 +1980,53 @@
         }
       }
     },
+    "After ChatGPT finishes signing in, copy the full redirected URL and paste it here to complete OAuth." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nachdem du dich bei ChatGPT angemeldet hast, kopiere die vollständige Weiterleitungs-URL und füge sie hier ein, um OAuth abzuschließen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "After ChatGPT finishes signing in, copy the full redirected URL and paste it here to complete OAuth."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Después de iniciar sesión en ChatGPT, copia la URL completa de redirección y pégala aquí para completar OAuth."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Après la connexion à ChatGPT, copie l'URL complète de redirection et colle-la ici pour terminer OAuth."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ChatGPT へのサインインが完了したら、完全なリダイレクト URL をコピーしてここに貼り付け、OAuth を完了してください。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ChatGPT 로그인이 끝나면 전체 리디렉션 URL을 복사해 여기에 붙여넣어 OAuth를 완료하세요."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "完成 ChatGPT 登录后，复制完整的重定向 URL 并粘贴到这里，以完成 OAuth。"
+          }
+        }
+      }
+    },
     "After setting up, click the model identifier to edit it or retrieve a list from the server." : {
       "localizations" : {
         "de" : {
@@ -5017,6 +5064,52 @@
         }
       }
     },
+    "Awaiting Redirect URL" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Warte auf Redirect-URL"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Awaiting Redirect URL"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esperando URL de redirección"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "URL de redirection en attente"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "リダイレクト URL を待機中"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "리디렉션 URL 대기 중"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "等待重定向 URL"
+          }
+        }
+      }
+    },
     "Back" : {
       "localizations" : {
         "de" : {
@@ -6087,6 +6180,52 @@
         }
       }
     },
+    "Cancel Sign In" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anmeldung abbrechen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancel Sign In"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancelar inicio de sesión"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Annuler la connexion"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "サインインをキャンセル"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "로그인 취소"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "取消登录"
+          }
+        }
+      }
+    },
     "Cancelled" : {
       "localizations" : {
         "de" : {
@@ -6773,6 +6912,52 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "聊天模板"
+          }
+        }
+      }
+    },
+    "ChatGPT OAuth Session" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ChatGPT-OAuth-Sitzung"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ChatGPT OAuth Session"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sesión OAuth de ChatGPT"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Session OAuth ChatGPT"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ChatGPT OAuth セッション"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ChatGPT OAuth 세션"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ChatGPT OAuth 会话"
           }
         }
       }
@@ -8019,6 +8204,52 @@
         }
       }
     },
+    "Codex Format" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Codex-Format"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Codex Format"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Formato Codex"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Format Codex"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Codex 形式"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Codex 형식"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Codex 格式"
+          }
+        }
+      }
+    },
     "Collapse Reasoning Content" : {
       "localizations" : {
         "de" : {
@@ -8245,6 +8476,53 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "完整"
+          }
+        }
+      }
+    },
+    "Complete Sign In" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anmeldung abschließen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Complete Sign In"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Completar inicio de sesión"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Terminer la connexion"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "サインインを完了"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "로그인 완료"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "完成登录"
           }
         }
       }
@@ -13826,6 +14104,52 @@
         }
       }
     },
+    "Disconnect ChatGPT" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ChatGPT trennen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Disconnect ChatGPT"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Desconectar ChatGPT"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Déconnecter ChatGPT"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ChatGPT の接続を解除"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ChatGPT 연결 해제"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "断开 ChatGPT"
+          }
+        }
+      }
+    },
     "Disconnected" : {
       "localizations" : {
         "de" : {
@@ -14792,6 +15116,52 @@
         }
       }
     },
+    "Edit Bearer Token (Optional)" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bearer-Token bearbeiten (optional)"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit Bearer Token (Optional)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Editar token Bearer (opcional)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modifier le jeton Bearer (optionnel)"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bearer トークンを編集（任意）"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bearer 토큰 편집(선택 사항)"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "编辑 Bearer Token（可选）"
+          }
+        }
+      }
+    },
     "Edit Branding Name" : {
       "localizations" : {
         "de" : {
@@ -15341,52 +15711,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "编辑模板"
-          }
-        }
-      }
-    },
-    "Edit Workgroup (Optional)" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Arbeitsgruppe bearbeiten (optional)"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Edit Workgroup (Optional)"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Editar grupo de trabajo (opcional)"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Modifier le groupe de travail (facultatif)"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ワークグループを編集（任意）"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "워크그룹 편집(선택 사항)"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "编辑工作组（可选）"
           }
         }
       }
@@ -17307,6 +17631,52 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "退出评测"
+          }
+        }
+      }
+    },
+    "Exiting now will interrupt the running conversation." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wenn Sie jetzt beenden, wird die laufende Konversation unterbrochen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exiting now will interrupt the running conversation."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Si sales ahora, se interrumpirá la conversación en curso."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quitter maintenant interrompra la conversation en cours."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "今すぐ終了すると、進行中の会話が中断されます。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "지금 종료하면 진행 중인 대화가 중단됩니다."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "现在退出会中断正在进行的对话。"
           }
         }
       }
@@ -20666,6 +21036,52 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "旗帜"
+          }
+        }
+      }
+    },
+    "FlowDown refreshes and applies ChatGPT OAuth credentials automatically for this endpoint." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "FlowDown aktualisiert ChatGPT-OAuth-Anmeldedaten für diesen Endpunkt automatisch und wendet sie an."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "FlowDown refreshes and applies ChatGPT OAuth credentials automatically for this endpoint."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "FlowDown actualiza y aplica automáticamente las credenciales OAuth de ChatGPT para este endpoint."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "FlowDown actualise et applique automatiquement les identifiants OAuth ChatGPT pour ce point de terminaison."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "FlowDown はこのエンドポイント向けに ChatGPT OAuth 認証情報を自動で更新し、適用します。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "FlowDown는 이 엔드포인트에 대해 ChatGPT OAuth 자격 증명을 자동으로 갱신하고 적용합니다."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "FlowDown 会为这个端点自动刷新并应用 ChatGPT OAuth 凭证。"
           }
         }
       }
@@ -33730,6 +34146,53 @@
         }
       }
     },
+    "Paste Redirect URL" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Redirect-URL einfügen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paste Redirect URL"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pegar URL de redirección"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Coller l'URL de redirection"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "リダイレクト URL を貼り付け"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "리디렉션 URL 붙여넣기"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "粘贴重定向 URL"
+          }
+        }
+      }
+    },
     "Pasteboard" : {
       "localizations" : {
         "de" : {
@@ -36925,6 +37388,98 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "最近使用"
+          }
+        }
+      }
+    },
+    "Recommended" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Empfohlen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recommended"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recomendado"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recommandé"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "おすすめ"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "추천"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "推荐"
+          }
+        }
+      }
+    },
+    "Reconnect ChatGPT" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ChatGPT erneut verbinden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reconnect ChatGPT"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reconectar ChatGPT"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reconnecter ChatGPT"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ChatGPT を再接続"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ChatGPT 다시 연결"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "重新连接 ChatGPT"
           }
         }
       }
@@ -41806,6 +42361,52 @@
         }
       }
     },
+    "Sign In to ChatGPT" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bei ChatGPT anmelden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sign In to ChatGPT"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Iniciar sesión en ChatGPT"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se connecter à ChatGPT"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ChatGPT にサインイン"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ChatGPT에 로그인"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "登录 ChatGPT"
+          }
+        }
+      }
+    },
     "Size" : {
       "localizations" : {
         "de" : {
@@ -46133,52 +46734,6 @@
         }
       }
     },
-    "The endpoint needs to be written in full path to work. The path is usually /v1/chat/completions." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Der Endpunkt muss als vollständiger Pfad angegeben werden, meist /v1/chat/completions."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "The endpoint needs to be written in full path to work. The path is usually /v1/chat/completions."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "El endpoint debe escribirse con la ruta completa; normalmente es /v1/chat/completions."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "L’endpoint doit être indiqué avec le chemin complet. En général, le chemin est /v1/chat/completions."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "エンドポイントはフルパスで指定する必要があります。通常 /v1/chat/completions です。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "엔드포인트는 전체 경로로 작성해야 동작합니다. 일반적으로 /v1/chat/completions 경로입니다."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "推理端点需要写入完整的路径才能工作。路径通常是 /v1/chat/completions。"
-          }
-        }
-      }
-    },
     "The latest conversation does not contain any messages." : {
       "localizations" : {
         "de" : {
@@ -47789,52 +48344,6 @@
         }
       }
     },
-    "This data has been saved, but we could not match a request format for this endpoint. This is usually a mistake. In most cases your request should end with /v1/chat/completions." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Diese Daten wurden gespeichert, aber es wurde kein Anfrageformat für diesen Endpunkt gefunden. Meist ein Fehler. In den meisten Fällen sollte die Anfrage mit /v1/chat/completions enden."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "This data has been saved, but we could not match a request format for this endpoint. This is usually a mistake. In most cases your request should end with /v1/chat/completions."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Estos datos se guardaron, pero no pudimos coincidir un formato de solicitud para este endpoint. Suele ser un error. En la mayoría de casos la solicitud debe terminar con /v1/chat/completions."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ces données ont été enregistrées, mais nous n’avons pas trouvé de format de requête pour cet endpoint. C’est généralement une erreur. Dans la plupart des cas, votre requête devrait se terminer par /v1/chat/completions."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "データは保存されましたが、このエンドポイントに適したリクエスト形式が見つかりません。多くの場合リクエストは /v1/chat/completions で終わる必要があります。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "데이터는 저장되었지만 이 엔드포인트에 맞는 요청 형식을 찾지 못했습니다. 보통 실수이며, 대부분 요청은 /v1/chat/completions 로 끝나야 합니다."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "数据已保存，但无法匹配该端点的请求格式。通常这是一个错误，大多数情况下请求应以 /v1/chat/completions 结尾。"
-          }
-        }
-      }
-    },
     "This device is not eligible for Apple Intelligence. Requires compatible hardware." : {
       "localizations" : {
         "de" : {
@@ -48337,98 +48846,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "此处的数据将会在请求时添加到报头中，并覆盖已有的任何报头数据。"
-          }
-        }
-      }
-    },
-    "This value will be added to the request to distinguish the workgroup on the remote." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dieser Wert wird der Anfrage hinzugefügt, um die Arbeitsgruppe auf dem Remote zu unterscheiden."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "This value will be added to the request to distinguish the workgroup on the remote."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Este valor se añadirá a la solicitud para distinguir el grupo de trabajo en el remoto."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cette valeur sera ajoutée à la requête pour distinguer le groupe de travail distant."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "この値はリモートのワークグループを識別するためリクエストに付加されます。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "원격에서 워크그룹을 구분하기 위해 요청에 추가됩니다."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "此选项的值将添加到请求报文中，用于在远端区分工作组。"
-          }
-        }
-      }
-    },
-    "This value will be added to the request to distinguish the workgroup on the remote. This part is optional, if not used, leave it blank." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dieser Wert wird der Anfrage hinzugefügt, um die Arbeitsgruppe auf dem Remote zu unterscheiden. Optional; bei Nichtnutzung leer lassen."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "This value will be added to the request to distinguish the workgroup on the remote. This part is optional, if not used, leave it blank."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Este valor se añadirá a la solicitud para distinguir el grupo de trabajo en el remoto. Es opcional; si no se usa, déjalo en blanco."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cette valeur sera ajoutée à la requête pour distinguer le groupe de travail distant. Cette partie est facultative ; laissez vide si non utilisée."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "この値はリモートのワークグループ識別用としてリクエストに付加されます。任意項目なので不要なら空のままにしてください。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "원격 워크그룹을 구분하기 위해 요청에 추가됩니다. 선택 사항이므로 사용하지 않을 경우 비워두세요."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "此选项的值将添加到请求报文中，用于在远端区分工作组。此部分可选，若不使用，请留空。"
           }
         }
       }
@@ -52551,98 +52968,6 @@
         }
       }
     },
-    "Update All" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Alle aktualisieren"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Update All"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Actualizar todo"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tout mettre à jour"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "すべて更新"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "모두 업데이트"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "全部更新"
-          }
-        }
-      }
-    },
-    "Update All Models" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Alle Modelle aktualisieren"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Update All Models"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Actualizar todos los modelos"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mettre à jour tous les modèles"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "全モデルを更新"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "모든 모델 업데이트"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "更新全部模型"
-          }
-        }
-      }
-    },
     "Update Available" : {
       "localizations" : {
         "de" : {
@@ -52961,6 +53286,52 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "使用对话模型"
+          }
+        }
+      }
+    },
+    "Use ChatGPT Codex-compatible response format." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verwende ein mit ChatGPT Codex kompatibles Antwortformat."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Use ChatGPT Codex-compatible response format."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Usa un formato de respuesta compatible con ChatGPT Codex."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Utiliser un format de réponse compatible avec ChatGPT Codex."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ChatGPT Codex 互換のレスポンス形式を使用します。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ChatGPT Codex와 호환되는 응답 형식을 사용합니다."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "使用与 ChatGPT Codex 兼容的响应格式。"
           }
         }
       }
@@ -56461,6 +56832,52 @@
         }
       }
     },
+    "When provided, FlowDown sends this value as Authorization: Bearer <token>. Leave it empty when your endpoint uses custom headers or anonymous access." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wenn ein Wert angegeben ist, sendet FlowDown ihn als Authorization: Bearer <token>. Lass das Feld leer, wenn dein Endpunkt benutzerdefinierte Header oder anonymen Zugriff verwendet."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "When provided, FlowDown sends this value as Authorization: Bearer <token>. Leave it empty when your endpoint uses custom headers or anonymous access."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cuando se proporciona, FlowDown envía este valor como Authorization: Bearer <token>. Déjalo vacío si tu endpoint usa encabezados personalizados o acceso anónimo."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lorsqu'une valeur est fournie, FlowDown l'envoie comme Authorization: Bearer <token>. Laisse ce champ vide si ton point de terminaison utilise des en-têtes personnalisés ou un accès anonyme."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "値を入力すると、FlowDown はそれを Authorization: Bearer <token> として送信します。エンドポイントがカスタムヘッダーまたは匿名アクセスを使う場合は空のままにしてください。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "값을 입력하면 FlowDown가 이를 Authorization: Bearer <token>으로 전송합니다. 엔드포인트가 사용자 정의 헤더나 익명 액세스를 사용한다면 비워 두세요."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "填写后，FlowDown 会将这个值作为 Authorization: Bearer <token> 发送。你的端点如果使用自定义请求头或匿名访问，这里保持为空即可。"
+          }
+        }
+      }
+    },
     "When selecting a new chat model, also set it as the default model." : {
       "localizations" : {
         "de" : {
@@ -56687,98 +57104,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "虽然使用视觉评估模型可能会丢失一些信息，但它能使需要视觉输入的任务成为可能。"
-          }
-        }
-      }
-    },
-    "Workgroup (Optional)" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Arbeitsgruppe (optional)"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Workgroup (Optional)"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Grupo de trabajo (opcional)"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Groupe de travail (facultatif)"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ワークグループ（任意）"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "워크그룹(선택 사항)"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "工作组（可选）"
-          }
-        }
-      }
-    },
-    "Would you like to apply the new workgroup to all? This requires the inference endpoint and the old workgroup equal to the current editing." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Soll die neue Arbeitsgruppe auf alle angewendet werden? Dafür müssen Inferenz-Endpunkt und alte Arbeitsgruppe mit der aktuellen Bearbeitung übereinstimmen."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Would you like to apply the new workgroup to all? This requires the inference endpoint and the old workgroup equal to the current editing."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "¿Quieres aplicar el nuevo grupo de trabajo a todo? Requiere que el endpoint de inferencia y el grupo de trabajo anterior coincidan con la edición actual."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Voulez-vous appliquer le nouveau groupe de travail à tous ? Cela nécessite que l’endpoint d’inférence et l’ancien groupe de travail correspondent à l’édition actuelle."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "新しいワークグループをすべてに適用しますか？推論エンドポイントと旧ワークグループが現在の編集内容と一致している必要があります。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "새 워크그룹을 모두에 적용할까요? 추론 엔드포인트와 이전 워크그룹이 현재 편집 중인 값과 같아야 합니다."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "你是否希望将新的工作组应用到全部模型上？这要求推理端点与旧工作组和当前编辑的内容一致。"
           }
         }
       }
@@ -57617,52 +57942,6 @@
         }
       },
       "shouldTranslate" : false
-    },
-    "Exiting now will interrupt the running conversation." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Exiting now will interrupt the running conversation."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Wenn Sie jetzt beenden, wird die laufende Konversation unterbrochen."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Si sales ahora, se interrumpirá la conversación en curso."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Quitter maintenant interrompra la conversation en cours."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "今すぐ終了すると、進行中の会話が中断されます。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "지금 종료하면 진행 중인 대화가 중단됩니다."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "现在退出会中断正在进行的对话。"
-          }
-        }
-      }
     }
   },
   "version" : "1.0"

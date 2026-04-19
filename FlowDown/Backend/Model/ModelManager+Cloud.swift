@@ -76,6 +76,20 @@ extension ModelManager {
             }
             return scanCloudModels()
         }
+        for model in models {
+            let canonicalEndpoint = CloudModel.canonicalOpenAICodexOAuthEndpoint(for: model.endpoint)
+            let sanitizedHeaders = model.headers.removingLegacyFlowDownHeaders()
+            let shouldRewriteEndpoint = canonicalEndpoint != nil && canonicalEndpoint != model.endpoint
+            if shouldRewriteEndpoint || sanitizedHeaders != model.headers {
+                sdb.cloudModelEdit(identifier: model.id) {
+                    if let canonicalEndpoint {
+                        $0.update(\.endpoint, to: canonicalEndpoint)
+                    }
+                    $0.update(\.headers, to: sanitizedHeaders)
+                }
+                return scanCloudModels()
+            }
+        }
         return models
     }
 
@@ -88,12 +102,26 @@ extension ModelManager {
 
     func newCloudModel(profile: CloudModel) -> CloudModel {
         profile.update(\.objectId, to: UUID().uuidString)
+        let sanitizedHeaders = profile.headers.removingLegacyFlowDownHeaders()
+        if sanitizedHeaders != profile.headers {
+            profile.update(\.headers, to: sanitizedHeaders)
+        }
+        if let canonicalEndpoint = CloudModel.canonicalOpenAICodexOAuthEndpoint(for: profile.endpoint) {
+            profile.update(\.endpoint, to: canonicalEndpoint)
+        }
         try? sdb.cloudModelPut(profile)
         defer { cloudModels.send(scanCloudModels()) }
         return profile
     }
 
     func insertCloudModel(_ model: CloudModel) {
+        let sanitizedHeaders = model.headers.removingLegacyFlowDownHeaders()
+        if sanitizedHeaders != model.headers {
+            model.update(\.headers, to: sanitizedHeaders)
+        }
+        if let canonicalEndpoint = CloudModel.canonicalOpenAICodexOAuthEndpoint(for: model.endpoint) {
+            model.update(\.endpoint, to: canonicalEndpoint)
+        }
         try? sdb.cloudModelPut(model)
         cloudModels.send(scanCloudModels())
     }
@@ -119,6 +147,10 @@ extension ModelManager {
             block([])
             return
         }
+        if model.usesAutomaticOpenAIOAuth {
+            block(CloudModel.openAICodexRecommendedModelIdentifiers)
+            return
+        }
         let endpoint = model.endpoint
         var model_list_endpoint = model.model_list_endpoint
         if model_list_endpoint.contains("$INFERENCE_ENDPOINT$") {
@@ -132,37 +164,45 @@ extension ModelManager {
             block([])
             return
         }
-        var request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalAndRemoteCacheData, timeoutInterval: 30)
-        if !model.token.isEmpty { request.setValue("Bearer \(model.token)", forHTTPHeaderField: "Authorization") }
-        // model.headers can override default headers including Authorization
-        for (key, value) in model.headers {
-            request.setValue(value, forHTTPHeaderField: key)
-        }
         let deliver: ([String]) -> Void = { input in
             Task { @MainActor in
                 block(input)
             }
         }
-        URLSession.shared.dataTask(with: request) { data, response, error in
-            guard error == nil else {
-                Logger.network.errorFile("[fetchModelList] request error: \(error!.localizedDescription)")
-                return deliver([])
-            }
-            if let http = response as? HTTPURLResponse {
-                if http.statusCode != 200 {
+
+        Task {
+            do {
+                let authentication = try await resolvedCloudAuthentication(for: model)
+                var request = URLRequest(
+                    url: url,
+                    cachePolicy: .reloadIgnoringLocalAndRemoteCacheData,
+                    timeoutInterval: 30,
+                )
+                if !authentication.apiKey.isEmpty {
+                    request.setValue("Bearer \(authentication.apiKey)", forHTTPHeaderField: "Authorization")
+                }
+                for (key, value) in authentication.additionalHeaders {
+                    request.setValue(value, forHTTPHeaderField: key)
+                }
+
+                let (data, response) = try await URLSession.shared.data(for: request)
+                if let http = response as? HTTPURLResponse, http.statusCode != 200 {
                     Logger.network.errorFile("[fetchModelList] non-200 status: \(http.statusCode) for URL: \(url.absoluteString)")
                 }
-            }
-            guard let data else { return deliver([]) }
-            guard let json = try? JSONSerialization.jsonObject(with: data, options: []) else {
-                if let str = String(data: data, encoding: .utf8) {
-                    Logger.network.errorFile("[fetchModelList] non-JSON response: \(str.prefix(256))...")
+                guard let json = try? JSONSerialization.jsonObject(with: data, options: []) else {
+                    if let str = String(data: data, encoding: .utf8) {
+                        Logger.network.errorFile("[fetchModelList] non-JSON response: \(str.prefix(256))...")
+                    }
+                    deliver([])
+                    return
                 }
-                return deliver([])
+                let value = scrubModel(fromDic: json).sorted()
+                deliver(value)
+            } catch {
+                Logger.network.errorFile("[fetchModelList] request error: \(error.localizedDescription)")
+                deliver([])
             }
-            let value = self.scrubModel(fromDic: json).sorted()
-            deliver(value)
-        }.resume()
+        }
     }
 
     private func scrubModel(fromDic dic: Any) -> [String] {

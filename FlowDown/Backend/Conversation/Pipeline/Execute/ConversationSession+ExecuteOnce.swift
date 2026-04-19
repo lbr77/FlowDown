@@ -32,6 +32,7 @@ extension ConversationSession {
             with: modelID,
             input: requestMessages,
             tools: tools,
+            requestSessionID: id,
         )
         defer { self.stopThinking(for: message.objectId) }
 

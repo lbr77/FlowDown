@@ -15,6 +15,8 @@ extension CloudModel.ResponseFormat {
             "$INFERENCE_ENDPOINT$/../../models"
         case .responses:
             "$INFERENCE_ENDPOINT$/../models"
+        case .codex:
+            ""
         }
     }
 }
@@ -24,7 +26,7 @@ extension CloudModel.ResponseFormat {
         switch self {
         case .chatCompletions:
             String(localized: "Completions Format")
-        case .responses:
+        case .responses, .codex:
             String(localized: "Responses Format")
         }
     }
@@ -33,7 +35,7 @@ extension CloudModel.ResponseFormat {
         switch self {
         case .chatCompletions:
             String(localized: "Use OpenAI-compatible chat completions.") + " " + "(POST /v1/chat/completions)"
-        case .responses:
+        case .responses, .codex:
             String(localized: "Use OpenAI-compatible chat response format.") + " " + "(POST /v1/responses)"
         }
     }
@@ -42,7 +44,9 @@ extension CloudModel.ResponseFormat {
 extension CloudModel.ResponseFormat {
     static func inferredFormat(fromEndpoint endpoint: String) -> CloudModel.ResponseFormat? {
         guard let normalized = normalizeEndpoint(endpoint) else { return nil }
-        return allCases.first { $0.matchesNormalizedEndpoint(normalized) }
+        return allCases
+            .sorted { $0.longestEndpointSuffixLength > $1.longestEndpointSuffixLength }
+            .first { $0.matchesNormalizedEndpoint(normalized) }
     }
 }
 
@@ -76,6 +80,12 @@ private extension CloudModel.ResponseFormat {
             ["/v1/chat/completions", "/chat/completions"]
         case .responses:
             ["/v1/responses", "/responses"]
+        case .codex:
+            ["/backend-api/codex/responses", "/backend-api/codex"]
         }
+    }
+
+    var longestEndpointSuffixLength: Int {
+        endpointSuffixes.map(\.count).max() ?? 0
     }
 }

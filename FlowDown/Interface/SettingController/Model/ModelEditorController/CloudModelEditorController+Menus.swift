@@ -174,9 +174,13 @@ extension CloudModelEditorController {
         let displayValue = trimmed.isEmpty ? String(localized: "Not Configured") : trimmed
         view.configure(value: displayValue)
 
-        guard !trimmed.isEmpty else { return }
+        guard !trimmed.isEmpty else {
+            rerenderContent()
+            return
+        }
 
         guard let inferredFormat = CloudModel.ResponseFormat.inferredFormat(fromEndpoint: trimmed) else {
+            rerenderContent()
             presentEndpointFormatMismatchAlert()
             return
         }
@@ -195,7 +199,17 @@ extension CloudModelEditorController {
                     editable.update(\.model_list_endpoint, to: inferredFormat.defaultModelListEndpoint)
                 }
             }
+            if model.usesAutomaticOpenAIOAuth,
+               model.model_identifier.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+            {
+                ModelManager.shared.editCloudModel(identifier: modelId) { editable in
+                    editable.update(\.model_identifier, to: CloudModel.openAICodexDefaultModelIdentifier)
+                }
+            }
         }
+
+        rerenderContent()
+        promptForOpenAIOAuthIfNeeded(using: trimmed)
     }
 
     func presentEndpointFormatMismatchAlert() {
@@ -203,7 +217,7 @@ extension CloudModelEditorController {
             guard let self else { return }
             let alert = AlertViewController(
                 title: "Unable to Match Request Format",
-                message: "This data has been saved, but we could not match a request format for this endpoint. This is usually a mistake. In most cases your request should end with /v1/chat/completions.",
+                message: "This data has been saved, but FlowDown could not match a request format for this endpoint. Common endings are /v1/chat/completions, /v1/responses, or /backend-api/codex/responses.",
             ) { context in
                 context.addAction(title: "OK", attribute: .accent) {
                     context.dispose()
@@ -249,6 +263,24 @@ extension CloudModelEditorController {
                 UIPasteboard.general.string = model.model_identifier
             }
             menuElements.append(copyAction)
+        }
+
+        if model.usesAutomaticOpenAIOAuth {
+            let recommendedActions = CloudModel.openAICodexRecommendedModelIdentifiers.map { identifier in
+                UIAction(title: identifier) { _ in
+                    ModelManager.shared.editCloudModel(identifier: model.id) {
+                        $0.update(\.model_identifier, to: identifier)
+                    }
+                    view.configure(value: identifier)
+                }
+            }
+            menuElements.append(UIMenu(
+                title: String(localized: "Recommended"),
+                image: UIImage(systemName: "star"),
+                options: [.displayInline],
+                children: recommendedActions,
+            ))
+            return menuElements
         }
 
         let deferredElement = UIDeferredMenuElement.uncached { [weak self, weak view] completion in

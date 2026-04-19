@@ -37,7 +37,7 @@ extension ModelManager {
             assert(!Thread.isMainThread)
 
             do {
-                let client = try self.chatService(
+                let client = try await self.chatService(
                     for: model.id,
                     additionalBodyField: [:],
                 )
@@ -224,35 +224,43 @@ extension ModelManager {
     private func chatService(
         for identifier: ModelIdentifier,
         additionalBodyField: [String: Any],
-    ) throws -> any ChatService {
+        requestSessionID: String? = nil,
+    ) async throws -> any ChatService {
         if let chatServiceFactory {
-            return try chatServiceFactory(identifier, additionalBodyField)
+            return try chatServiceFactory(identifier, additionalBodyField, requestSessionID)
         }
-        return try makeDefaultChatService(
+        return try await makeDefaultChatService(
             for: identifier,
             additionalBodyField: additionalBodyField,
+            requestSessionID: requestSessionID,
         )
     }
 
     private func makeDefaultChatService(
         for identifier: ModelIdentifier,
         additionalBodyField: [String: Any],
-    ) throws -> any ChatService {
+        requestSessionID: String? = nil,
+    ) async throws -> any ChatService {
         if #available(iOS 26.0, macCatalyst 26.0, *), identifier == AppleIntelligenceModel.shared.modelIdentifier {
             return AppleIntelligenceChatClient()
         }
         if let model = cloudModel(identifier: identifier) {
-            let endpoint = resolveEndpointComponents(from: model.endpoint)
+            let resolvedEndpoint = CloudModel.canonicalOpenAICodexOAuthEndpoint(for: model.endpoint) ?? model.endpoint
+            let endpoint = resolveEndpointComponents(from: resolvedEndpoint)
+            let authentication = try await resolvedCloudAuthentication(
+                for: model,
+                requestSessionID: requestSessionID,
+            )
             // Use additionalBodyField directly without merging model's bodyFields
             // Callers should explicitly merge bodyFields if needed
-            switch model.response_format {
+            switch authentication.responseFormat {
             case .chatCompletions:
                 return RemoteCompletionsChatClient(
                     model: model.model_identifier,
                     baseURL: endpoint.baseURL,
                     path: endpoint.path,
-                    apiKey: model.token,
-                    additionalHeaders: model.headers,
+                    apiKey: authentication.apiKey,
+                    additionalHeaders: authentication.additionalHeaders,
                     additionalBodyField: additionalBodyField,
                 )
             case .responses:
@@ -260,9 +268,19 @@ extension ModelManager {
                     model: model.model_identifier,
                     baseURL: endpoint.baseURL,
                     path: endpoint.path,
-                    apiKey: model.token,
-                    additionalHeaders: model.headers,
+                    apiKey: authentication.apiKey,
+                    additionalHeaders: authentication.additionalHeaders,
                     additionalBodyField: additionalBodyField,
+                )
+            case .codex:
+                return RemoteResponsesChatClient(
+                    model: model.model_identifier,
+                    baseURL: endpoint.baseURL,
+                    path: endpoint.path,
+                    apiKey: authentication.apiKey,
+                    additionalHeaders: authentication.additionalHeaders,
+                    additionalBodyField: additionalBodyField,
+                    requestProfile: .codex,
                 )
             }
         } else if let model = localModel(identifier: identifier) {
@@ -332,10 +350,12 @@ extension ModelManager {
         maxCompletionTokens: Int? = nil,
         input: [ChatRequestBody.Message],
         tools: [ChatRequestBody.Tool]? = nil,
+        requestSessionID: String? = nil,
     ) async throws -> ChatResponse {
-        let client = try chatService(
+        let client = try await chatService(
             for: modelID,
             additionalBodyField: modelBodyFields(for: modelID),
+            requestSessionID: requestSessionID,
         )
         let body = try ChatRequestBody(
             messages: prepareRequestBody(modelID: modelID, messages: input),
@@ -351,10 +371,12 @@ extension ModelManager {
         maxCompletionTokens: Int? = nil,
         input: [ChatRequestBody.Message],
         tools: [ChatRequestBody.Tool]? = nil,
+        requestSessionID: String? = nil,
     ) async throws -> AsyncThrowingStream<ChatResponseChunk, Error> {
-        let client = try chatService(
+        let client = try await chatService(
             for: modelID,
             additionalBodyField: modelBodyFields(for: modelID),
+            requestSessionID: requestSessionID,
         )
         let body = try ChatRequestBody(
             messages: prepareRequestBody(modelID: modelID, messages: input),

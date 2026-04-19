@@ -96,6 +96,7 @@ extension ConversationManager {
                 let stream = try await ModelManager.shared.streamingInfer(
                     with: model,
                     input: messageBody,
+                    requestSessionID: conv.id,
                 )
                 let mess = sess.appendNewMessage(role: .assistant)
                 var compressed = ""

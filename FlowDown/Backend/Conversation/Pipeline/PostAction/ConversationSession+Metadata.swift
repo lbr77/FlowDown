@@ -178,6 +178,7 @@ extension ConversationSessionManager.Session {
             let response = try await ModelManager.shared.infer(
                 with: model,
                 input: input,
+                requestSessionID: id,
             )
 
             return ConversationMetadataParser.parseResponse(response.text)

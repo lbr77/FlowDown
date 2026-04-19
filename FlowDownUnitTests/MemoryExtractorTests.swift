@@ -23,7 +23,7 @@ struct MemoryExtractorTests {
                     tools: [],
                 )
             })
-            manager.chatServiceFactory = { _, _ in service }
+            manager.chatServiceFactory = { _, _, _ in service }
             let conversationId = UUID().uuidString
 
             await MemoryExtractor.shared.extractIfNeeded(
@@ -55,7 +55,7 @@ struct MemoryExtractorTests {
             let service = ChatServiceSpy(chatHandler: { _ in
                 ChatResponse(reasoning: "", text: #"["User likes coffee"]"#, images: [], tools: [])
             })
-            manager.chatServiceFactory = { _, _ in service }
+            manager.chatServiceFactory = { _, _, _ in service }
 
             storeTool.isEnabled = false
             await MemoryExtractor.shared.extractIfNeeded(
@@ -119,7 +119,7 @@ struct MemoryExtractorTests {
                     tools: [],
                 )
             })
-            manager.chatServiceFactory = { _, _ in service }
+            manager.chatServiceFactory = { _, _, _ in service }
 
             await MemoryExtractor.shared.extractIfNeeded(
                 from: makeMessages(
@@ -157,7 +157,7 @@ struct MemoryExtractorTests {
                     tools: [],
                 )
             })
-            manager.chatServiceFactory = { _, _ in invalidOutputService }
+            manager.chatServiceFactory = { _, _, _ in invalidOutputService }
 
             await MemoryExtractor.shared.extractIfNeeded(
                 from: makeMessages(
@@ -180,7 +180,7 @@ struct MemoryExtractorTests {
                     NSLocalizedDescriptionKey: "Simulated extraction failure",
                 ])
             })
-            manager.chatServiceFactory = { _, _ in failingService }
+            manager.chatServiceFactory = { _, _, _ in failingService }
 
             await MemoryExtractor.shared.extractIfNeeded(
                 from: makeMessages(
@@ -220,7 +220,7 @@ struct MemoryExtractorTests {
                     tools: [],
                 )
             })
-            manager.chatServiceFactory = { _, _ in service }
+            manager.chatServiceFactory = { _, _, _ in service }
 
             let conversationId = UUID().uuidString
             let messages = makeMessages(

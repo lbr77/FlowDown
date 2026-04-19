@@ -72,7 +72,7 @@ struct ImportExportRoundTripSuite {
             token: "test-token",
             headers: [
                 "Authorization": "Bearer OVERRIDE",
-                "X-Title": "FlowDown",
+                "X-Custom-Header": "test-value",
             ],
             bodyFields: #"{"foo":"bar","temperature":0.2}"#,
             context: .medium_64k,
@@ -115,6 +115,79 @@ struct ImportExportRoundTripSuite {
         #expect(imported.comment == original.comment)
         #expect(imported.name == original.name)
         #expect(imported.response_format == original.response_format)
+    }
+
+    @Test
+    func `scanCloudModels strips legacy FlowDown headers from stored models`() async throws {
+        try ensureEnvironment()
+        await resetRelevantData()
+
+        let legacy = CloudModel(
+            deviceId: Storage.deviceId,
+            model_identifier: "legacy/test-model",
+            endpoint: "https://example.invalid/v1/chat/completions",
+            token: "test-token",
+            headers: [
+                "HTTP-Referer": "legacy-referer",
+                "X-Title": "legacy-title",
+                "X-Custom-Header": "test-value",
+            ]
+        )
+        try sdb.cloudModelPut(legacy)
+
+        let scanned = ModelManager.shared.scanCloudModels()
+        let stored = sdb.cloudModel(with: legacy.id)
+
+        #expect(scanned.count == 1)
+        #expect(scanned.first?.headers == ["X-Custom-Header": "test-value"])
+        #expect(stored?.headers == ["X-Custom-Header": "test-value"])
+    }
+
+    @Test
+    func `scanCloudModels migrates legacy codex endpoint only once`() async throws {
+        try ensureEnvironment()
+        await resetRelevantData()
+
+        let legacy = CloudModel(
+            deviceId: Storage.deviceId,
+            model_identifier: "legacy/codex-model",
+            endpoint: "https://chatgpt.com/backend-api/codex",
+            headers: [:]
+        )
+        try sdb.cloudModelPut(legacy)
+
+        let firstScan = ModelManager.shared.scanCloudModels()
+        let secondScan = ModelManager.shared.scanCloudModels()
+        let stored = sdb.cloudModel(with: legacy.id)
+
+        #expect(firstScan.count == 1)
+        #expect(secondScan.count == 1)
+        #expect(firstScan.first?.endpoint == CloudModel.openAICodexOAuthEndpoint)
+        #expect(secondScan.first?.endpoint == CloudModel.openAICodexOAuthEndpoint)
+        #expect(stored?.endpoint == CloudModel.openAICodexOAuthEndpoint)
+    }
+
+    @Test
+    func `fetchModelList returns recommended codex models for oauth endpoints`() async throws {
+        try ensureEnvironment()
+        await resetRelevantData()
+
+        let oauthModel = CloudModel(
+            deviceId: Storage.deviceId,
+            model_identifier: "",
+            model_list_endpoint: "",
+            endpoint: CloudModel.openAICodexOAuthEndpoint,
+            response_format: .codex,
+        )
+        try sdb.cloudModelPut(oauthModel)
+
+        let models = await withCheckedContinuation { continuation in
+            ModelManager.shared.fetchModelList(identifier: oauthModel.id) { list in
+                continuation.resume(returning: list)
+            }
+        }
+
+        #expect(models == CloudModel.openAICodexRecommendedModelIdentifiers)
     }
 
     @Test
