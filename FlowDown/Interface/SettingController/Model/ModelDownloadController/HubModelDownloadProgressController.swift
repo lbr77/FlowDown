@@ -285,6 +285,8 @@ class HubModelDownloadProgressController: UIViewController {
         view.addSubview(bottomStackView)
         view.addSubview(oversizeWarningLabel)
 
+        containerStackView.addArrangedSubview(contentStackView)
+
         containerStackView.snp.makeConstraints { make in
             make.centerX.centerY.equalToSuperview()
             make.leading.trailing.equalToSuperview().inset(32)
@@ -332,8 +334,7 @@ class HubModelDownloadProgressController: UIViewController {
     // MARK: - Update UI
 
     private func updateContent() {
-        // Clear content stack
-        contentStackView.arrangedSubviews.forEach { $0.removeFromSuperview() }
+        resetArrangedSubviews(in: contentStackView)
 
         if let errorText = progress.error?.localizedDescription {
             // Error state
@@ -400,10 +401,14 @@ class HubModelDownloadProgressController: UIViewController {
             cancelButton.alpha = progress.cancellable ? 1 : 0
         }
 
-        containerStackView.arrangedSubviews.forEach { $0.removeFromSuperview() }
-        containerStackView.addArrangedSubview(contentStackView)
-
         updateOversizeWarning()
+    }
+
+    private func resetArrangedSubviews(in stackView: UIStackView) {
+        stackView.arrangedSubviews.forEach { subview in
+            stackView.removeArrangedSubview(subview)
+            subview.removeFromSuperview()
+        }
     }
 
     private func updateProgress() {
