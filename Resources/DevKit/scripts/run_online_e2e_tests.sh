@@ -62,10 +62,9 @@ echo "[+] running online e2e"
 cd "$REPO_ROOT"
 
 xcodebuild -downloadComponent MetalToolchain > /dev/null
-DESTINATION=$(bash Resources/DevKit/scripts/get_first_ios_simulator.sh)
+DESTINATION=$(./Resources/DevKit/scripts/get_first_ios_simulator.sh)
 
-set -o pipefail
-xcodebuild \
+XCBUILD_LABEL=test-online-e2e ./Resources/DevKit/scripts/run_xcodebuild.sh \
   -workspace FlowDown.xcworkspace \
   -scheme FlowDown \
   -configuration Debug \
@@ -73,5 +72,4 @@ xcodebuild \
   test \
   CODE_SIGNING_ALLOWED=NO \
   CODE_SIGNING_REQUIRED=NO \
-  CODE_SIGN_IDENTITY="" \
-  | xcbeautify -qq
+  CODE_SIGN_IDENTITY=""

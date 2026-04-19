@@ -11,12 +11,13 @@ FlowDown is a Swift-based AI/LLM client for iOS and macOS (Catalyst) with a priv
 ## Environment & Tooling
 
 - Prefer opening `FlowDown.xcworkspace` so the app and frameworks resolve together under shared schemes.
-- `ChatClientKit` intentionally relies on the `FlowDown.xcworkspace` package override for `mlx-swift-lm`; keep `Frameworks/ChatClientKit/Package.swift` on `branch: "main"` for that dependency and validate integration changes through workspace builds, not standalone `swift build`/`swift test` of `ChatClientKit`.
+- `ChatClientKit` intentionally relies on the `FlowDown.xcworkspace` package override for `mlx-swift-lm`; keep `Frameworks/ChatClientKit/Package.swift` on `branch: "main"` for that dependency and validate integration changes through workspace builds driven by the top-level `Makefile`.
 - Use Xcode 26.x (Swift 6.0 toolchain) or newer to satisfy package manifests and the Swift `Testing` library.
 - Build on macOS 26 or later to ensure compatibility with the required toolchain.
-- Install `xcbeautify` (`brew install xcbeautify`) and pipe build output through `xcbeautify -qq` for readable logs.
+- Install `xcbeautify` (`brew install xcbeautify`) so the shared `make` workflows can produce readable logs.
 - Lean on automation in `Resources/DevKit/scripts/` (localization, archiving, licensing) instead of ad-hoc scripts.
-- Use `make` for release archives; clean artifacts with `make clean` (wrapper around `Resources/DevKit/scripts/archive.all.sh`).
+- Always use the top-level `Makefile` for build, test, package resolution, archive, and verification flows.
+- Do not run `xcodebuild` directly in the shell. If a workflow is missing, add a `Makefile` target first.
 
 ## Platform Requirements & Dependencies
 
@@ -40,24 +41,34 @@ FlowDown is a Swift-based AI/LLM client for iOS and macOS (Catalyst) with a priv
 ## Build & Run Commands
 
 - Open the workspace: `open FlowDown.xcworkspace`.
-- Debug builds:
-  - iOS: `xcodebuild -workspace FlowDown.xcworkspace -scheme FlowDown -configuration Debug -destination 'platform=iOS Simulator,name=iPhone 15' | xcbeautify -qq`
-  - macOS Catalyst: `xcodebuild -workspace FlowDown.xcworkspace -scheme FlowDown-Catalyst -configuration Debug -destination 'platform=macOS' | xcbeautify -qq`
-- Release archive (both platforms):
-  - `make` to archive (runs `Resources/DevKit/scripts/archive.all.sh`)
-  - `make clean` to reset build artifacts
-- Package-only verification: `swift build --package-path Frameworks/<Package>`
-- When running CI-style builds, prefer `xcodebuild -workspace FlowDown.xcworkspace -scheme FlowDown -configuration Debug build`
+- Build commands:
+  - `make build` for the iOS and Mac Catalyst app
+  - `make build-ios` for the iOS app
+  - `make build-catalyst` for the Mac Catalyst app
+  - `make build-extension` for the translation provider extension
+- Test commands:
+  - `make test` for the default test flow
+  - `make test-unit` for app tests on the first available iOS simulator
+  - `make test-online-e2e` for the online E2E suite
+- Package and license commands:
+  - `make package-resolve` to resolve SwiftPM packages
+  - `make scan-license` to refresh `OpenSourceLicenses.md`
+- Localization commands:
+  - `make localization-check` to check for missing translations
+  - `make localization-stale-check` to prune stale keys and verify completeness
+- Archive commands:
+  - `make archive` for both platforms
+  - `make archive-ios` for the iOS archive
+  - `make archive-macos` for the macOS archive
+- Cleanup commands:
+  - `make clean-build` to remove repo-local build artifacts
+  - `make clean` to remove repo-local build artifacts and derived data
 - Archive script automatically commits changes and bumps version before building; ensure the working tree is clean beforehand.
-- Run unit tests (auto-discovers `FlowDownUnitTests`): `xcodebuild -workspace FlowDown.xcworkspace -scheme FlowDown -configuration Debug test | xcbeautify -qq`
+- Use `make help` to discover the current command surface.
 - Localization validation helpers:
-  - `python3 Resources/DevKit/scripts/check_translations.py FlowDown/Resources/Localizable.xcstrings`
-  - `python3 Resources/DevKit/scripts/check_untranslated.py FlowDown/Resources/Localizable.xcstrings`
+  - `make localization-stale-check`
+  - `make localization-check`
   - `python3 Resources/DevKit/scripts/update_missing_i18n.py FlowDown/Resources/Localizable.xcstrings` to scaffold missing locales; extend `NEW_STRINGS` in that script when adding new keys.
-  - `python3 Resources/DevKit/scripts/check_translations.py FlowDownTranslationProvider/Localizable.xcstrings`
-  - `python3 Resources/DevKit/scripts/check_untranslated.py FlowDownTranslationProvider/Localizable.xcstrings`
-  - `python3 Resources/DevKit/scripts/check_translations.py FlowDownWidgets/Localizable.xcstrings`
-  - `python3 Resources/DevKit/scripts/check_untranslated.py FlowDownWidgets/Localizable.xcstrings`
 
 ## Shell Script Style
 
@@ -107,8 +118,8 @@ FlowDown is a Swift-based AI/LLM client for iOS and macOS (Catalyst) with a priv
 ## Testing Expectations
 
 - Add or update unit/UI tests alongside behavioural changes. `FlowDownUnitTests` leverages the Swift `Testing` library—author tests as `@Test func featureScenario_expectation()`.
-- Expand coverage inside Swift packages via their `Tests/` targets (`swift test --package-path Frameworks/<Package>`).
-- Run app-level tests with `xcodebuild -workspace FlowDown.xcworkspace -scheme FlowDown -configuration Debug -destination 'platform=iOS Simulator,name=iPhone 15' test | xcbeautify -qq`.
+- Run app-level tests through `make test` or `make test-unit`.
+- Use `make test-online-e2e` when a change needs the online E2E suite.
 - Document manual verification steps whenever UI or integration flows lack automation.
 
 ## Security & Privacy
@@ -145,7 +156,7 @@ FlowDown is a Swift-based AI/LLM client for iOS and macOS (Catalyst) with a priv
 
 ### CI Review Check
 
-- For GitHub Actions workflows that invoke `xcodebuild`, ensure `xcodebuild -downloadComponent MetalToolchain` runs before build/test/archive steps.
+- For GitHub Actions workflows that build, test, or archive through `make` or project scripts, ensure the Metal toolchain is downloaded before the first build step.
 
 ## Localization Guidelines
 
