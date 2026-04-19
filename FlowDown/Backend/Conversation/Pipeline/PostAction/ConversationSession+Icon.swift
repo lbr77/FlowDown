@@ -87,7 +87,7 @@ extension ConversationSessionManager.Session {
             }
 
             let ret = ConversationMetadataParser.normalizedIcon(sanitizedContent)
-            Logger.ui.debugFile("generated conversation icon: \(ret)")
+            Logger.ui.debugFile("generated conversation icon: \(ret ?? "nil")")
             return ret
         } catch {
             Logger.ui.errorFile("failed to generate icon: \(error)")

@@ -242,16 +242,16 @@ enum InferenceIntentHandler {
 
         if options.saveToConversation {
             let now = dependencies.clock()
-            await MainActor.run {
-                dependencies.persistConversation(
-                    modelIdentifier,
-                    trimmedMessage,
-                    attachmentsForConversation,
-                    response,
-                    trimmedReasoning,
-                    now,
-                )
-            }
+            let attachments = attachmentsForConversation
+            let responseToPersist = response
+            await dependencies.persistConversation(
+                modelIdentifier,
+                trimmedMessage,
+                attachments,
+                responseToPersist,
+                trimmedReasoning,
+                now,
+            )
         }
 
         return response

@@ -9,6 +9,7 @@ import Combine
 import CryptoKit
 import Digger
 import Foundation
+import os
 import Storage
 
 private let huggingFaceAPI = HuggingFaceAPI()
@@ -254,19 +255,28 @@ extension ModelManager {
             var capturedError: Error?
             while i < 5 {
                 try progress.checkContinue()
-                var someProgressHasBeenMade = false
+                struct DownloadAttemptState {
+                    var didResumeContinuation = false
+                    var hasMadeProgress = false
+                }
+                let attemptState = OSAllocatedUnfairLock(initialState: DownloadAttemptState())
                 do {
                     let result: URL = try await withUnsafeThrowingContinuation { cont in
-                        var isContCalled = false
                         DiggerManager.shared.download(with: remoteURL)
                             .progress {
                                 progress.progressOnFile(filename, progress: $0)
-                                someProgressHasBeenMade = true
+                                attemptState.withLock { state in
+                                    state.hasMadeProgress = true
+                                }
                             }
                             .speed { progress.speedUpdate(speed: $0) }
                             .completion { completion in
-                                guard !isContCalled else { return }
-                                isContCalled = true
+                                let shouldResume = attemptState.withLock { state in
+                                    guard !state.didResumeContinuation else { return false }
+                                    state.didResumeContinuation = true
+                                    return true
+                                }
+                                guard shouldResume else { return }
                                 switch completion {
                                 case let .failure(error): cont.resume(throwing: error)
                                 case let .success(url): cont.resume(returning: url)
@@ -285,6 +295,9 @@ extension ModelManager {
                     break
                 } catch {
                     capturedError = error
+                    let someProgressHasBeenMade = attemptState.withLock { state in
+                        state.hasMadeProgress
+                    }
                     if !someProgressHasBeenMade { i += 1 }
                     sleep(3)
                     continue
