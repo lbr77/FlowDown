@@ -77,7 +77,6 @@ extension ConversationSession {
         for try await chunk in try await ModelManager.shared.streamingInfer(
             with: decision,
             input: messages,
-            requestSessionID: id,
         ) {
             await requestUpdate(view: currentMessageListView)
             switch chunk {

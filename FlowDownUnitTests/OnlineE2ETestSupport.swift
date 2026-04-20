@@ -8,7 +8,6 @@ enum OnlineE2ETestSupport {
     static let tokenEnvName = "FLOWDOWN_ONLINE_E2E_TOKEN"
     static let endpointEnvName = "FLOWDOWN_ONLINE_E2E_ENDPOINT"
     static let responsesEndpointEnvName = "FLOWDOWN_ONLINE_E2E_ENDPOINT_RESPONSES"
-    static let codexEndpointEnvName = "FLOWDOWN_ONLINE_E2E_ENDPOINT_CODEX"
 
     // Endpoint and token are provided via environment variables (backed by
     // GitHub secrets in CI or a local ~/.testing file). The model identifier,
@@ -98,22 +97,6 @@ enum OnlineE2ETestSupport {
         )
     }
 
-    static func makeCodexClient() throws -> RemoteResponsesChatClient {
-        let environment = ProcessInfo.processInfo.environment
-        let token = try resolveToken(in: environment)
-        let endpoint = try resolveEndpoint(for: .codex, in: environment)
-        let (baseURL, path) = splitEndpoint(endpoint)
-        let fixture = embeddedFixture.overriding(with: environment)
-        return RemoteResponsesChatClient(
-            model: fixture.modelIdentifier,
-            baseURL: baseURL,
-            path: path,
-            apiKey: token,
-            additionalHeaders: fixture.headers,
-            requestProfile: .codex,
-        )
-    }
-
     // MARK: - Resolution
 
     private static func resolveToken(in environment: [String: String]) throws -> String {
@@ -174,11 +157,6 @@ enum OnlineE2ETestSupport {
                 return deriveResponsesEndpoint(from: base)
             }
             return nil
-        case .codex:
-            if let explicit = trimmedNonEmpty(environment[codexEndpointEnvName]) {
-                return explicit
-            }
-            return secretFromFiles(named: "flowdown-online-e2e.endpoint.codex")
         }
     }
 

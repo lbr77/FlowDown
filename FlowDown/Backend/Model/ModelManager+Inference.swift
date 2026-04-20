@@ -200,14 +200,23 @@ extension ModelManager {
     /// - Parameter identifier: The model identifier
     /// - Returns: A dictionary of body fields, or empty dictionary if not found or empty
     public func modelBodyFields(for identifier: ModelIdentifier) -> [String: Any] {
-        guard let model = cloudModel(identifier: identifier),
-              !model.bodyFields.isEmpty,
-              let data = model.bodyFields.data(using: .utf8),
-              let jsonObject = try? JSONSerialization.jsonObject(with: data) as? [String: Any]
-        else {
+        guard let model = cloudModel(identifier: identifier) else {
             return [:]
         }
-        return jsonObject
+
+        var bodyFields: [String: Any] = [:]
+        if !model.bodyFields.isEmpty,
+           let data = model.bodyFields.data(using: .utf8),
+           let jsonObject = try? JSONSerialization.jsonObject(with: data) as? [String: Any]
+        {
+            bodyFields = jsonObject
+        }
+
+        if model.usesAutomaticOpenAIOAuth {
+            return CloudModel.mergedAutomaticOpenAIOAuthBodyFields(into: bodyFields)
+        }
+
+        return bodyFields
     }
 
     private static func hasNonEmptyText(_ text: String) -> Bool {
@@ -224,22 +233,19 @@ extension ModelManager {
     private func chatService(
         for identifier: ModelIdentifier,
         additionalBodyField: [String: Any],
-        requestSessionID: String? = nil,
     ) async throws -> any ChatService {
         if let chatServiceFactory {
-            return try chatServiceFactory(identifier, additionalBodyField, requestSessionID)
+            return try chatServiceFactory(identifier, additionalBodyField)
         }
         return try await makeDefaultChatService(
             for: identifier,
             additionalBodyField: additionalBodyField,
-            requestSessionID: requestSessionID,
         )
     }
 
     private func makeDefaultChatService(
         for identifier: ModelIdentifier,
         additionalBodyField: [String: Any],
-        requestSessionID: String? = nil,
     ) async throws -> any ChatService {
         if #available(iOS 26.0, macCatalyst 26.0, *), identifier == AppleIntelligenceModel.shared.modelIdentifier {
             return AppleIntelligenceChatClient()
@@ -247,10 +253,7 @@ extension ModelManager {
         if let model = cloudModel(identifier: identifier) {
             let resolvedEndpoint = CloudModel.canonicalOpenAICodexOAuthEndpoint(for: model.endpoint) ?? model.endpoint
             let endpoint = resolveEndpointComponents(from: resolvedEndpoint)
-            let authentication = try await resolvedCloudAuthentication(
-                for: model,
-                requestSessionID: requestSessionID,
-            )
+            let authentication = try await resolvedCloudAuthentication(for: model)
             // Use additionalBodyField directly without merging model's bodyFields
             // Callers should explicitly merge bodyFields if needed
             switch authentication.responseFormat {
@@ -271,16 +274,6 @@ extension ModelManager {
                     apiKey: authentication.apiKey,
                     additionalHeaders: authentication.additionalHeaders,
                     additionalBodyField: additionalBodyField,
-                )
-            case .codex:
-                return RemoteResponsesChatClient(
-                    model: model.model_identifier,
-                    baseURL: endpoint.baseURL,
-                    path: endpoint.path,
-                    apiKey: authentication.apiKey,
-                    additionalHeaders: authentication.additionalHeaders,
-                    additionalBodyField: additionalBodyField,
-                    requestProfile: .codex,
                 )
             }
         } else if let model = localModel(identifier: identifier) {
@@ -350,12 +343,10 @@ extension ModelManager {
         maxCompletionTokens: Int? = nil,
         input: [ChatRequestBody.Message],
         tools: [ChatRequestBody.Tool]? = nil,
-        requestSessionID: String? = nil,
     ) async throws -> ChatResponse {
         let client = try await chatService(
             for: modelID,
             additionalBodyField: modelBodyFields(for: modelID),
-            requestSessionID: requestSessionID,
         )
         let body = try ChatRequestBody(
             messages: prepareRequestBody(modelID: modelID, messages: input),
@@ -371,12 +362,10 @@ extension ModelManager {
         maxCompletionTokens: Int? = nil,
         input: [ChatRequestBody.Message],
         tools: [ChatRequestBody.Tool]? = nil,
-        requestSessionID: String? = nil,
     ) async throws -> AsyncThrowingStream<ChatResponseChunk, Error> {
         let client = try await chatService(
             for: modelID,
             additionalBodyField: modelBodyFields(for: modelID),
-            requestSessionID: requestSessionID,
         )
         let body = try ChatRequestBody(
             messages: prepareRequestBody(modelID: modelID, messages: input),

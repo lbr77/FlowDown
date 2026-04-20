@@ -441,7 +441,7 @@ private extension CloudModelEditorController {
         view.configure(description: "Select which format this model should use when performing network requests.")
 
         let currentFormat: CloudModel.ResponseFormat = usesAutomaticOpenAIOAuth
-            ? .codex
+            ? .responses
             : (model?.response_format ?? .default)
         view.configure(value: currentFormat.localizedTitle)
         view.use { [weak self, weak view] in

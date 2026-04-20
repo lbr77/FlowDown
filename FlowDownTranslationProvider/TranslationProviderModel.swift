@@ -38,7 +38,7 @@ final class TranslationProviderModel: ObservableObject {
                     additionalBodyField: body,
                     dependencies: dependencies,
                 )
-            case .codex:
+            case .responses:
                 RemoteResponsesChatClient(
                     model: model.model_identifier,
                     baseURL: endpoint.baseURL,
@@ -46,7 +46,7 @@ final class TranslationProviderModel: ObservableObject {
                     apiKey: model.token,
                     additionalHeaders: model.headers,
                     additionalBodyField: body,
-                    requestProfile: .codex,
+                    requestProfile: .standard,
                     dependencies: dependencies,
                 )
             }

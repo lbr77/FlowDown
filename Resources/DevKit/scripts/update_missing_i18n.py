@@ -146,6 +146,38 @@ NEW_STRINGS: dict[str, dict[str, str]] = {
         "ko": "값을 입력하면 FlowDown가 이를 Authorization: Bearer <token>으로 전송합니다. 엔드포인트가 사용자 정의 헤더나 익명 액세스를 사용한다면 비워 두세요.",
         "zh-Hans": "填写后，FlowDown 会将这个值作为 Authorization: Bearer <token> 发送。你的端点如果使用自定义请求头或匿名访问，这里保持为空即可。",
     },
+    "Awaiting Device Code": {
+        "de": "Warte auf Gerätecode",
+        "es": "Esperando código de dispositivo",
+        "fr": "Code d'appareil en attente",
+        "ja": "デバイスコードを待機中",
+        "ko": "디바이스 코드 대기 중",
+        "zh-Hans": "等待设备码",
+    },
+    "Sign In with Device Code": {
+        "de": "Mit Gerätecode anmelden",
+        "es": "Iniciar sesión con código de dispositivo",
+        "fr": "Se connecter avec un code d'appareil",
+        "ja": "デバイスコードでサインイン",
+        "ko": "디바이스 코드로 로그인",
+        "zh-Hans": "使用设备码登录",
+    },
+    "Open the link below and enter this one-time code to sign in. The code expires in 15 minutes.": {
+        "de": "Öffne den Link unten und gib diesen Einmalcode ein, um dich anzumelden. Der Code läuft in 15 Minuten ab.",
+        "es": "Abre el siguiente enlace e introduce este código de un solo uso para iniciar sesión. El código caduca en 15 minutos.",
+        "fr": "Ouvre le lien ci-dessous et saisis ce code à usage unique pour te connecter. Le code expire dans 15 minutes.",
+        "ja": "以下のリンクを開き、このワンタイムコードを入力してサインインしてください。コードは 15 分後に期限切れになります。",
+        "ko": "아래 링크를 열고 이 일회용 코드를 입력하여 로그인하세요. 코드는 15분 후에 만료됩니다.",
+        "zh-Hans": "打开下方链接并输入这个一次性代码来登录。代码将在 15 分钟后过期。",
+    },
+    "Copy Code": {
+        "de": "Code kopieren",
+        "es": "Copiar código",
+        "fr": "Copier le code",
+        "ja": "コードをコピー",
+        "ko": "코드 복사",
+        "zh-Hans": "复制代码",
+    },
 }
 
 if __name__ == "__main__":

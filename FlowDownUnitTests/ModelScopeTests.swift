@@ -21,12 +21,12 @@ struct ModelScopeTests {
         #expect(
             CloudModel.ResponseFormat.inferredFormat(
                 fromEndpoint: "https://chatgpt.com/backend-api/codex/?query=1",
-            ) == .codex,
+            ) == .responses,
         )
         #expect(
             CloudModel.ResponseFormat.inferredFormat(
                 fromEndpoint: "https://chatgpt.com/backend-api/codex/responses?query=1",
-            ) == .codex,
+            ) == .responses,
         )
         #expect(
             CloudModel.isOpenAICodexOAuthEndpoint(
@@ -40,20 +40,27 @@ struct ModelScopeTests {
         )
         #expect(
             CloudModel.canonicalOpenAICodexOAuthEndpoint(
-                for: "https://chatgpt.com/backend-api/codex",
+                for: "https://chatgpt.com/backend-api/codex/responses",
             ) == CloudModel.openAICodexOAuthEndpoint,
         )
 
         let oauthModel = CloudModel(
             deviceId: Storage.deviceId,
-            endpoint: "https://chatgpt.com/backend-api/codex",
+            endpoint: "https://chatgpt.com/backend-api/codex/responses",
         )
         #expect(oauthModel.usesAutomaticOpenAIOAuth)
 
         #expect(CloudModel.ResponseFormat.inferredFormat(fromEndpoint: "") == missingFormat)
         #expect(CloudModel.ResponseFormat.chatCompletions.defaultModelListEndpoint == "$INFERENCE_ENDPOINT$/../../models")
         #expect(CloudModel.ResponseFormat.responses.defaultModelListEndpoint == "$INFERENCE_ENDPOINT$/../models")
-        #expect(CloudModel.ResponseFormat.codex.defaultModelListEndpoint.isEmpty)
+    }
+
+    @Test
+    func `legacy codex response format decodes as responses`() throws {
+        let payload = Data(#"{"deviceId":"test-device","response_format":"codex"}"#.utf8)
+        let decoded = try JSONDecoder().decode(CloudModel.self, from: payload)
+
+        #expect(decoded.response_format == .responses)
     }
 
     @Test

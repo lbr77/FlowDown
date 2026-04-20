@@ -15,8 +15,6 @@ extension CloudModel.ResponseFormat {
             "$INFERENCE_ENDPOINT$/../../models"
         case .responses:
             "$INFERENCE_ENDPOINT$/../models"
-        case .codex:
-            ""
         }
     }
 }
@@ -26,7 +24,7 @@ extension CloudModel.ResponseFormat {
         switch self {
         case .chatCompletions:
             String(localized: "Completions Format")
-        case .responses, .codex:
+        case .responses:
             String(localized: "Responses Format")
         }
     }
@@ -35,7 +33,7 @@ extension CloudModel.ResponseFormat {
         switch self {
         case .chatCompletions:
             String(localized: "Use OpenAI-compatible chat completions.") + " " + "(POST /v1/chat/completions)"
-        case .responses, .codex:
+        case .responses:
             String(localized: "Use OpenAI-compatible chat response format.") + " " + "(POST /v1/responses)"
         }
     }
@@ -79,9 +77,7 @@ private extension CloudModel.ResponseFormat {
         case .chatCompletions:
             ["/v1/chat/completions", "/chat/completions"]
         case .responses:
-            ["/v1/responses", "/responses"]
-        case .codex:
-            ["/backend-api/codex/responses", "/backend-api/codex"]
+            ["/backend-api/codex/responses", "/v1/responses", "/responses"]
         }
     }
 

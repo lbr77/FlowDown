@@ -5064,7 +5064,54 @@
         }
       }
     },
+    "Awaiting Device Code" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Warte auf Gerätecode"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Awaiting Device Code"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esperando código de dispositivo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Code d'appareil en attente"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "デバイスコードを待機中"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "디바이스 코드 대기 중"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "等待设备码"
+          }
+        }
+      }
+    },
     "Awaiting Redirect URL" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -8205,6 +8252,7 @@
       }
     },
     "Codex Format" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -11099,6 +11147,52 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "复制图片"
+          }
+        }
+      }
+    },
+    "Copy Code" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Code kopieren"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copy Code"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copiar código"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copier le code"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "コードをコピー"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "코드 복사"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "复制代码"
           }
         }
       }
@@ -33226,6 +33320,52 @@
         }
       }
     },
+    "Open the link below and enter this one-time code to sign in. The code expires in 15 minutes." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Öffne den Link unten und gib diesen Einmalcode ein, um dich anzumelden. Der Code läuft in 15 Minuten ab."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open the link below and enter this one-time code to sign in. The code expires in 15 minutes."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abre el siguiente enlace e introduce este código de un solo uso para iniciar sesión. El código caduca en 15 minutos."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvre le lien ci-dessous et saisis ce code à usage unique pour te connecter. Le code expire dans 15 minutes."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "以下のリンクを開き、このワンタイムコードを入力してサインインしてください。コードは 15 分後に期限切れになります。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "아래 링크를 열고 이 일회용 코드를 입력하여 로그인하세요. 코드는 15분 후에 만료됩니다."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "打开下方链接并输入这个一次性代码来登录。代码将在 15 分钟后过期。"
+          }
+        }
+      }
+    },
     "Open the setting page." : {
       "localizations" : {
         "de" : {
@@ -42403,6 +42543,52 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "登录 ChatGPT"
+          }
+        }
+      }
+    },
+    "Sign In with Device Code" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mit Gerätecode anmelden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sign In with Device Code"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Iniciar sesión con código de dispositivo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se connecter avec un code d'appareil"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "デバイスコードでサインイン"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "디바이스 코드로 로그인"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "使用设备码登录"
           }
         }
       }
@@ -53291,6 +53477,7 @@
       }
     },
     "Use ChatGPT Codex-compatible response format." : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {

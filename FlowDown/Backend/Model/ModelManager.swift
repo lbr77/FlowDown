@@ -23,7 +23,7 @@ class ModelManager: NSObject {
     typealias ModelIdentifier = String
     typealias LocalModelIdentifier = LocalModel.ID
     typealias CloudModelIdentifier = CloudModel.ID
-    typealias ChatServiceFactory = (_ identifier: ModelIdentifier, _ additionalBodyField: [String: Any], _ requestSessionID: String?) throws -> any ChatService
+    typealias ChatServiceFactory = (_ identifier: ModelIdentifier, _ additionalBodyField: [String: Any]) throws -> any ChatService
 
     let localModelDir: URL
     let localModelDownloadTempDir: URL

@@ -11,13 +11,12 @@ import Storage
 extension ModelManager {
     func resolvedCloudAuthentication(
         for model: CloudModel,
-        requestSessionID: String? = nil,
     ) async throws -> (
         apiKey: String,
         additionalHeaders: [String: String],
         responseFormat: CloudModel.ResponseFormat
     ) {
-        let responseFormat: CloudModel.ResponseFormat = model.usesAutomaticOpenAIOAuth ? .codex : model.response_format
+        let responseFormat: CloudModel.ResponseFormat = model.usesAutomaticOpenAIOAuth ? .responses : model.response_format
         let sanitizedHeaders = model.headers.removingLegacyFlowDownHeaders()
 
         guard model.usesAutomaticOpenAIOAuth else {
@@ -41,9 +40,6 @@ extension ModelManager {
         )
         if let accountID = session.accountID, !accountID.isEmpty {
             headers["ChatGPT-Account-ID"] = accountID
-        }
-        if let requestSessionID, !requestSessionID.isEmpty {
-            headers["session_id"] = requestSessionID
         }
         headers["Originator"] = OpenAIOAuthService.codexOriginator
         if session.isFedrampAccount {

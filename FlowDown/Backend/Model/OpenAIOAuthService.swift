@@ -24,9 +24,9 @@ actor OpenAIOAuthService {
     private static let defaultClientID = "app_EMoamEEZ73f0CkXaXp7hrann"
     private static let issuer = URL(string: "https://auth.openai.com")!
     static let codexOriginator = "codex_cli_rs"
-    private static let callbackPath = "/auth/callback"
     private static let credentialAccount = "default"
     private static let credentialExpiryLeeway: TimeInterval = 60
+    private static let deviceAuthTimeout: TimeInterval = 15 * 60
 
     struct Credentials: Codable {
         let accessToken: String
@@ -35,16 +35,11 @@ actor OpenAIOAuthService {
         let idToken: String?
     }
 
-    private struct PKCEState {
-        let verifier: String
-        let challenge: String
-        let state: String
-    }
-
-    private struct AuthorizationFlow {
-        let pkce: PKCEState
-        let redirectServer: OpenAIOAuthRedirectServer
-        let redirectURL: URL
+    struct DeviceCodeSession: Equatable {
+        let deviceAuthID: String
+        let userCode: String
+        let verificationURL: String
+        let interval: TimeInterval
     }
 
     private struct NamespacedAuthClaims: Decodable {
@@ -81,11 +76,54 @@ actor OpenAIOAuthService {
         }
     }
 
+    private struct DeviceCodeRequest: Encodable {
+        let clientID: String
+
+        enum CodingKeys: String, CodingKey {
+            case clientID = "client_id"
+        }
+    }
+
+    private struct DeviceCodeResponse: Decodable {
+        let deviceAuthID: String
+        let userCode: String
+        let interval: String
+
+        enum CodingKeys: String, CodingKey {
+            case deviceAuthID = "device_auth_id"
+            case userCode = "user_code"
+            case interval
+        }
+    }
+
+    private struct TokenPollRequest: Encodable {
+        let deviceAuthID: String
+        let userCode: String
+
+        enum CodingKeys: String, CodingKey {
+            case deviceAuthID = "device_auth_id"
+            case userCode = "user_code"
+        }
+    }
+
+    private struct TokenPollSuccessResponse: Decodable {
+        let authorizationCode: String
+        let codeChallenge: String
+        let codeVerifier: String
+
+        enum CodingKeys: String, CodingKey {
+            case authorizationCode = "authorization_code"
+            case codeChallenge = "code_challenge"
+            case codeVerifier = "code_verifier"
+        }
+    }
+
     private let keychain = OpenAIOAuthKeychainStore(service: "wiki.qaq.flowdown.openai.oauth")
     private let encoder = JSONEncoder()
     private let decoder = JSONDecoder()
 
-    private var currentFlow: AuthorizationFlow?
+    private var currentDeviceCodeSession: DeviceCodeSession?
+    private var deviceCodePollingTask: Task<Void, Never>?
 }
 
 extension OpenAIOAuthService {
@@ -93,8 +131,8 @@ extension OpenAIOAuthService {
         (try? loadCredentials()) != nil
     }
 
-    func isAuthenticating() -> Bool {
-        currentFlow != nil
+    func isDeviceCodeAuthorizing() -> Bool {
+        currentDeviceCodeSession != nil
     }
 
     func clearCredentials() throws {
@@ -102,12 +140,12 @@ extension OpenAIOAuthService {
         postCredentialsDidChange()
     }
 
-    func beginAuthorization(force: Bool = false) async throws -> URL {
-        if currentFlow != nil {
+    func beginDeviceCodeAuthorization(force: Bool = false) async throws -> DeviceCodeSession {
+        if currentDeviceCodeSession != nil {
             throw NSError(
                 domain: "OpenAIOAuthService",
                 code: -1,
-                userInfo: [NSLocalizedDescriptionKey: "OpenAI OAuth sign-in is already in progress."],
+                userInfo: [NSLocalizedDescriptionKey: "OpenAI device code sign-in is already in progress."]
             )
         }
 
@@ -115,55 +153,43 @@ extension OpenAIOAuthService {
             throw NSError(
                 domain: "OpenAIOAuthService",
                 code: -1,
-                userInfo: [NSLocalizedDescriptionKey: "OpenAI OAuth credentials are already available on this device."],
+                userInfo: [NSLocalizedDescriptionKey: "OpenAI OAuth credentials are already available on this device."]
             )
         }
 
-        let pkce = Self.generatePKCEState()
-        let redirectServer = try OpenAIOAuthRedirectServer(callbackPath: Self.callbackPath)
-        let redirectURL = try await redirectServer.start()
-        currentFlow = AuthorizationFlow(
-            pkce: pkce,
-            redirectServer: redirectServer,
-            redirectURL: redirectURL,
-        )
-        return Self.buildAuthorizeURL(pkce: pkce, redirectURL: redirectURL)
+        let session = try await requestDeviceCode()
+        currentDeviceCodeSession = session
+        return session
     }
 
-    func completeAuthorization(callbackURLString: String) async throws {
-        guard let flow = currentFlow else {
+    func completeDeviceCodeAuthorization() async throws {
+        guard let session = currentDeviceCodeSession else {
             throw NSError(
                 domain: "OpenAIOAuthService",
                 code: -1,
-                userInfo: [NSLocalizedDescriptionKey: "OpenAI OAuth sign-in has not started."],
+                userInfo: [NSLocalizedDescriptionKey: "OpenAI device code sign-in has not started."]
             )
         }
 
-        let callbackURL = try Self.parseCallbackURL(
-            callbackURLString,
-            expectedRedirectURL: flow.redirectURL,
+        defer {
+            currentDeviceCodeSession = nil
+            deviceCodePollingTask = nil
+        }
+
+        let pollResponse = try await pollForToken(session: session)
+        let redirectURI = Self.issuer.appendingPathComponent("deviceauth/callback").absoluteString
+        let credentials = try await exchangeCodeForTokens(
+            code: pollResponse.authorizationCode,
+            verifier: pollResponse.codeVerifier,
+            redirectURI: redirectURI
         )
-        try await finishAuthorization(flow: flow, callbackURL: callbackURL)
+        try saveCredentials(credentials)
     }
 
-    func cancelAuthorization() async {
-        if let redirectServer = currentFlow?.redirectServer {
-            await redirectServer.cancel()
-        }
-        currentFlow = nil
-    }
-
-    func awaitAuthorizationCompletion() async throws {
-        guard let flow = currentFlow else {
-            throw NSError(
-                domain: "OpenAIOAuthService",
-                code: -1,
-                userInfo: [NSLocalizedDescriptionKey: "OpenAI OAuth sign-in has not started."],
-            )
-        }
-
-        let callbackURL = try await flow.redirectServer.waitForCallbackURL()
-        try await finishAuthorization(flow: flow, callbackURL: callbackURL)
+    func cancelDeviceCodeAuthorization() {
+        deviceCodePollingTask?.cancel()
+        deviceCodePollingTask = nil
+        currentDeviceCodeSession = nil
     }
 
     func resolvedSession() async throws -> OpenAIOAuthSessionMetadata {
@@ -171,7 +197,7 @@ extension OpenAIOAuthService {
             throw NSError(
                 domain: "OpenAIOAuthService",
                 code: -1,
-                userInfo: [NSLocalizedDescriptionKey: "OpenAI OAuth credentials are unavailable. Configure the ChatGPT Codex endpoint again to sign in."],
+                userInfo: [NSLocalizedDescriptionKey: "OpenAI OAuth credentials are unavailable. Configure the ChatGPT Codex endpoint again to sign in."]
             )
         }
 
@@ -187,51 +213,13 @@ extension OpenAIOAuthService {
 
         let metadata = Self.sessionMetadata(
             accessToken: credentials.accessToken,
-            idToken: credentials.idToken,
+            idToken: credentials.idToken
         )
         return metadata
     }
 }
 
 private extension OpenAIOAuthService {
-    static func parseCallbackURL(
-        _ callbackURLString: String,
-        expectedRedirectURL: URL
-    ) throws -> URL {
-        let trimmed = callbackURLString.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmed.isEmpty, let callbackURL = URL(string: trimmed) else {
-            throw NSError(
-                domain: "OpenAIOAuthService",
-                code: -1,
-                userInfo: [NSLocalizedDescriptionKey: "FlowDown could not parse the pasted redirect URL."],
-            )
-        }
-
-        guard let components = URLComponents(url: callbackURL, resolvingAgainstBaseURL: false) else {
-            throw NSError(
-                domain: "OpenAIOAuthService",
-                code: -1,
-                userInfo: [NSLocalizedDescriptionKey: "FlowDown could not read the pasted redirect URL."],
-            )
-        }
-
-        let redirectComponents = URLComponents(url: expectedRedirectURL, resolvingAgainstBaseURL: false)
-        let expectedPort = redirectComponents?.port
-        if components.scheme != redirectComponents?.scheme
-            || components.host != redirectComponents?.host
-            || components.port != expectedPort
-            || components.path != redirectComponents?.path
-        {
-            throw NSError(
-                domain: "OpenAIOAuthService",
-                code: -1,
-                userInfo: [NSLocalizedDescriptionKey: "The pasted redirect URL does not match FlowDown's ChatGPT OAuth callback URL."],
-            )
-        }
-
-        return callbackURL
-    }
-
     func loadCredentials() throws -> Credentials? {
         guard let data = try keychain.load(account: Self.credentialAccount) else {
             return nil
@@ -244,10 +232,130 @@ private extension OpenAIOAuthService {
         postCredentialsDidChange()
     }
 
+    private func requestDeviceCode() async throws -> DeviceCodeSession {
+        let url = Self.issuer.appendingPathComponent("api/accounts/deviceauth/usercode")
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue(Self.codexOriginator, forHTTPHeaderField: "Originator")
+        request.httpBody = try encoder.encode(DeviceCodeRequest(clientID: Self.defaultClientID))
+
+        let (data, response) = try await URLSession.shared.data(for: request)
+
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw NSError(
+                domain: "OpenAIOAuthService",
+                code: -1,
+                userInfo: [NSLocalizedDescriptionKey: "OpenAI device code request failed because the server response was invalid."]
+            )
+        }
+
+        if httpResponse.statusCode == 404 {
+            throw NSError(
+                domain: "OpenAIOAuthService",
+                code: httpResponse.statusCode,
+                userInfo: [NSLocalizedDescriptionKey: "Device code login is not enabled for this server."]
+            )
+        }
+
+        guard (200 ..< 300).contains(httpResponse.statusCode) else {
+            let body = String(data: data, encoding: .utf8)?
+                .trimmingCharacters(in: .whitespacesAndNewlines)
+            let suffix = body?.isEmpty == false ? "\n\n\(body!)" : ""
+            throw NSError(
+                domain: "OpenAIOAuthService",
+                code: httpResponse.statusCode,
+                userInfo: [NSLocalizedDescriptionKey: "OpenAI device code request failed with status \(httpResponse.statusCode).\(suffix)"]
+            )
+        }
+
+        let payload: DeviceCodeResponse
+        do {
+            payload = try decoder.decode(DeviceCodeResponse.self, from: data)
+        } catch {
+            throw NSError(
+                domain: "OpenAIOAuthService",
+                code: -1,
+                userInfo: [NSLocalizedDescriptionKey: "FlowDown could not decode the OpenAI device code response: \(error.localizedDescription)"]
+            )
+        }
+
+        let interval = TimeInterval(payload.interval.trimmingCharacters(in: .whitespaces).prefix(10)) ?? 5
+        return DeviceCodeSession(
+            deviceAuthID: payload.deviceAuthID,
+            userCode: payload.userCode,
+            verificationURL: Self.issuer.appendingPathComponent("codex/device").absoluteString,
+            interval: max(interval, 5)
+        )
+    }
+
+    private func pollForToken(session: DeviceCodeSession) async throws -> TokenPollSuccessResponse {
+        let url = Self.issuer.appendingPathComponent("api/accounts/deviceauth/token")
+        let start = Date()
+        let requestBody = try encoder.encode(TokenPollRequest(
+            deviceAuthID: session.deviceAuthID,
+            userCode: session.userCode
+        ))
+
+        while Date().timeIntervalSince(start) < Self.deviceAuthTimeout {
+            try Task.checkCancellation()
+
+            var request = URLRequest(url: url)
+            request.httpMethod = "POST"
+            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+            request.httpBody = requestBody
+
+            let (data, response) = try await URLSession.shared.data(for: request)
+            guard let httpResponse = response as? HTTPURLResponse else {
+                throw NSError(
+                    domain: "OpenAIOAuthService",
+                    code: -1,
+                    userInfo: [NSLocalizedDescriptionKey: "OpenAI device auth poll failed because the server response was invalid."]
+                )
+            }
+
+            if httpResponse.statusCode == 403 || httpResponse.statusCode == 404 {
+                let remaining = Self.deviceAuthTimeout - Date().timeIntervalSince(start)
+                let sleepDuration = min(session.interval, max(remaining, 0))
+                if sleepDuration > 0 {
+                    try await Task.sleep(nanoseconds: UInt64(sleepDuration * 1_000_000_000))
+                }
+                continue
+            }
+
+            guard (200 ..< 300).contains(httpResponse.statusCode) else {
+                let body = String(data: data, encoding: .utf8)?
+                    .trimmingCharacters(in: .whitespacesAndNewlines)
+                let suffix = body?.isEmpty == false ? "\n\n\(body!)" : ""
+                throw NSError(
+                    domain: "OpenAIOAuthService",
+                    code: httpResponse.statusCode,
+                    userInfo: [NSLocalizedDescriptionKey: "OpenAI device auth failed with status \(httpResponse.statusCode).\(suffix)"]
+                )
+            }
+
+            do {
+                return try decoder.decode(TokenPollSuccessResponse.self, from: data)
+            } catch {
+                throw NSError(
+                    domain: "OpenAIOAuthService",
+                    code: -1,
+                    userInfo: [NSLocalizedDescriptionKey: "FlowDown could not decode the OpenAI device auth response: \(error.localizedDescription)"]
+                )
+            }
+        }
+
+        throw NSError(
+            domain: "OpenAIOAuthService",
+            code: -1,
+            userInfo: [NSLocalizedDescriptionKey: "Device auth timed out after 15 minutes."]
+        )
+    }
+
     func exchangeCodeForTokens(
         code: String,
         verifier: String,
-        redirectURL: URL,
+        redirectURI: String,
     ) async throws -> Credentials {
         var request = URLRequest(url: Self.issuer.appendingPathComponent("oauth/token"))
         request.httpMethod = "POST"
@@ -256,7 +364,7 @@ private extension OpenAIOAuthService {
         request.httpBody = URLComponents.formURLEncodedData([
             "grant_type": "authorization_code",
             "code": code,
-            "redirect_uri": redirectURL.absoluteString,
+            "redirect_uri": redirectURI,
             "client_id": Self.defaultClientID,
             "code_verifier": verifier,
         ])
@@ -267,14 +375,14 @@ private extension OpenAIOAuthService {
             throw NSError(
                 domain: "OpenAIOAuthService",
                 code: -1,
-                userInfo: [NSLocalizedDescriptionKey: "OpenAI OAuth exchange did not return a refresh token."],
+                userInfo: [NSLocalizedDescriptionKey: "OpenAI OAuth exchange did not return a refresh token."]
             )
         }
         return Credentials(
             accessToken: payload.accessToken,
             refreshToken: refreshToken,
             expiresAt: Date().addingTimeInterval(payload.expiresIn),
-            idToken: payload.idToken,
+            idToken: payload.idToken
         )
     }
 
@@ -286,7 +394,7 @@ private extension OpenAIOAuthService {
         request.httpBody = try encoder.encode(RefreshTokenRequest(
             clientID: Self.defaultClientID,
             grantType: "refresh_token",
-            refreshToken: credentials.refreshToken,
+            refreshToken: credentials.refreshToken
         ))
 
         let (data, response) = try await URLSession.shared.data(for: request)
@@ -295,7 +403,7 @@ private extension OpenAIOAuthService {
             accessToken: payload.accessToken,
             refreshToken: payload.refreshToken ?? credentials.refreshToken,
             expiresAt: Date().addingTimeInterval(payload.expiresIn),
-            idToken: payload.idToken ?? credentials.idToken,
+            idToken: payload.idToken ?? credentials.idToken
         )
     }
 
@@ -308,7 +416,7 @@ private extension OpenAIOAuthService {
             throw NSError(
                 domain: "OpenAIOAuthService",
                 code: -1,
-                userInfo: [NSLocalizedDescriptionKey: "OpenAI OAuth \(action) failed because the server response was invalid."],
+                userInfo: [NSLocalizedDescriptionKey: "OpenAI OAuth \(action) failed because the server response was invalid."]
             )
         }
 
@@ -319,7 +427,7 @@ private extension OpenAIOAuthService {
             throw NSError(
                 domain: "OpenAIOAuthService",
                 code: httpResponse.statusCode,
-                userInfo: [NSLocalizedDescriptionKey: "OpenAI OAuth \(action) failed with status \(httpResponse.statusCode).\(suffix)"],
+                userInfo: [NSLocalizedDescriptionKey: "OpenAI OAuth \(action) failed with status \(httpResponse.statusCode).\(suffix)"]
             )
         }
 
@@ -329,7 +437,7 @@ private extension OpenAIOAuthService {
             throw NSError(
                 domain: "OpenAIOAuthService",
                 code: -1,
-                userInfo: [NSLocalizedDescriptionKey: "FlowDown could not decode the OpenAI OAuth token response: \(error.localizedDescription)"],
+                userInfo: [NSLocalizedDescriptionKey: "FlowDown could not decode the OpenAI OAuth token response: \(error.localizedDescription)"]
             )
         }
     }
@@ -338,63 +446,6 @@ private extension OpenAIOAuthService {
         Task { @MainActor in
             NotificationCenter.default.post(name: .openAIOAuthCredentialsDidChange, object: nil)
         }
-    }
-
-    private func finishAuthorization(
-        flow: AuthorizationFlow,
-        callbackURL: URL,
-    ) async throws {
-        do {
-            let components = URLComponents(url: callbackURL, resolvingAgainstBaseURL: false)
-            let state = components?.queryItems?.first(where: { $0.name == "state" })?.value ?? ""
-            guard state == flow.pkce.state else {
-                throw NSError(
-                    domain: "OpenAIOAuthService",
-                    code: -1,
-                    userInfo: [NSLocalizedDescriptionKey: "OpenAI OAuth returned a mismatched state value."],
-                )
-            }
-
-            if let errorCode = components?.queryItems?.first(where: { $0.name == "error" })?.value,
-               !errorCode.isEmpty
-            {
-                let description = components?.queryItems?
-                    .first(where: { $0.name == "error_description" })?
-                    .value?
-                    .trimmingCharacters(in: .whitespacesAndNewlines)
-                let message = description?.isEmpty == false
-                    ? description!
-                    : "OpenAI OAuth returned an authorization error: \(errorCode)."
-                throw NSError(
-                    domain: "OpenAIOAuthService",
-                    code: NSUserCancelledError,
-                    userInfo: [NSLocalizedDescriptionKey: message],
-                )
-            }
-
-            let code = components?.queryItems?.first(where: { $0.name == "code" })?.value ?? ""
-            guard !code.isEmpty else {
-                throw NSError(
-                    domain: "OpenAIOAuthService",
-                    code: -1,
-                    userInfo: [NSLocalizedDescriptionKey: "OpenAI OAuth did not return an authorization code."],
-                )
-            }
-
-            let credentials = try await exchangeCodeForTokens(
-                code: code,
-                verifier: flow.pkce.verifier,
-                redirectURL: flow.redirectURL,
-            )
-            try saveCredentials(credentials)
-        } catch {
-            currentFlow = nil
-            await flow.redirectServer.cancel()
-            throw error
-        }
-
-        currentFlow = nil
-        await flow.redirectServer.cancel()
     }
 }
 
@@ -411,39 +462,6 @@ private extension OpenAIOAuthService {
             case expiresIn = "expires_in"
             case idToken = "id_token"
         }
-    }
-
-    private static func buildAuthorizeURL(
-        pkce: PKCEState,
-        redirectURL: URL
-    ) -> URL {
-        var components = URLComponents(url: issuer.appendingPathComponent("oauth/authorize"), resolvingAgainstBaseURL: false)!
-        components.queryItems = [
-            .init(name: "response_type", value: "code"),
-            .init(name: "client_id", value: defaultClientID),
-            .init(name: "redirect_uri", value: redirectURL.absoluteString),
-            .init(name: "scope", value: "openid profile email offline_access api.connectors.read api.connectors.invoke"),
-            .init(name: "code_challenge", value: pkce.challenge),
-            .init(name: "code_challenge_method", value: "S256"),
-            .init(name: "id_token_add_organizations", value: "true"),
-            .init(name: "codex_cli_simplified_flow", value: "true"),
-            .init(name: "state", value: pkce.state),
-            .init(name: "originator", value: codexOriginator),
-        ]
-        return components.url!
-    }
-
-    private static func generatePKCEState() -> PKCEState {
-        let verifier = randomBase64URL(count: 32)
-        let state = randomBase64URL(count: 16)
-        let challengeData = SHA256.hash(data: Data(verifier.utf8))
-        let challenge = Data(challengeData).base64URLEncodedString()
-        return PKCEState(verifier: verifier, challenge: challenge, state: state)
-    }
-
-    private static func randomBase64URL(count: Int) -> String {
-        let bytes = (0 ..< count).map { _ in UInt8.random(in: .min ... .max) }
-        return Data(bytes).base64URLEncodedString()
     }
 }
 
@@ -464,7 +482,7 @@ extension OpenAIOAuthService {
         return OpenAIOAuthSessionMetadata(
             accessToken: accessToken,
             accountID: accountID,
-            isFedrampAccount: envelope?.auth?.chatgptAccountIsFedramp ?? false,
+            isFedrampAccount: envelope?.auth?.chatgptAccountIsFedramp ?? false
         )
     }
 

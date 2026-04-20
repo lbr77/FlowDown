@@ -57,39 +57,7 @@ struct OpenAIOAuthServiceTests {
         #expect(metadata.isFedrampAccount == false)
     }
 
-    @Test
-    func `begin authorization includes codex oauth parameters`() async throws {
-        let service = OpenAIOAuthService.shared
-        let url = try await service.beginAuthorization(force: true)
-        defer {
-            Task {
-                await service.cancelAuthorization()
-            }
-        }
 
-        let components = try #require(URLComponents(url: url, resolvingAgainstBaseURL: false))
-        let queryItems = Dictionary(
-            uniqueKeysWithValues: (components.queryItems ?? []).map { ($0.name, $0.value ?? "") }
-        )
-
-        #expect(url.absoluteString.hasPrefix("https://auth.openai.com/oauth/authorize?"))
-        #expect(queryItems["response_type"] == "code")
-        #expect(queryItems["client_id"] == "app_EMoamEEZ73f0CkXaXp7hrann")
-        #expect(queryItems["scope"] == "openid profile email offline_access api.connectors.read api.connectors.invoke")
-        #expect(queryItems["code_challenge_method"] == "S256")
-        #expect(queryItems["id_token_add_organizations"] == "true")
-        #expect(queryItems["codex_cli_simplified_flow"] == "true")
-        #expect(queryItems["originator"] == OpenAIOAuthService.codexOriginator)
-
-        let redirectURI = try #require(queryItems["redirect_uri"])
-        let redirectURL = try #require(URL(string: redirectURI))
-        #expect(redirectURL.host == "localhost")
-        #expect(redirectURL.path == "/auth/callback")
-        #expect(redirectURL.port != nil)
-    }
-}
-
-private extension OpenAIOAuthServiceTests {
     static func makeJWT(payload: [String: Any]) throws -> String {
         let header = try base64URLJSON([
             "alg": "none",

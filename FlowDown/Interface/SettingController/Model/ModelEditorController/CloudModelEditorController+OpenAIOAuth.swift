@@ -34,7 +34,7 @@ extension CloudModelEditorController {
         Task { [weak self] in
             guard let self else { return }
             let hasCredentials = await OpenAIOAuthService.shared.hasCredentials()
-            let isAuthenticating = await OpenAIOAuthService.shared.isAuthenticating()
+            let isAuthenticating = await OpenAIOAuthService.shared.isDeviceCodeAuthorizing()
             if hasCredentials || isAuthenticating {
                 await MainActor.run {
                     self.rerenderContent()
@@ -51,11 +51,11 @@ extension CloudModelEditorController {
     func refreshOpenAIOAuthView(_ view: ConfigurableInfoView) {
         Task { [weak view] in
             let connected = await OpenAIOAuthService.shared.hasCredentials()
-            let isAuthenticating = await OpenAIOAuthService.shared.isAuthenticating()
+            let isAuthenticating = await OpenAIOAuthService.shared.isDeviceCodeAuthorizing()
             let status = connected
                 ? String(localized: "Connected")
                 : (isAuthenticating
-                    ? String(localized: "Awaiting Redirect URL")
+                    ? String(localized: "Awaiting Device Code")
                     : String(localized: "Disconnected"))
             await MainActor.run {
                 view?.configure(value: status)
@@ -92,7 +92,7 @@ private extension CloudModelEditorController {
     func presentOpenAIOAuthSessionAlert(from view: UIView) {
         Task { @MainActor in
             let connected = await OpenAIOAuthService.shared.hasCredentials()
-            let isAuthenticating = await OpenAIOAuthService.shared.isAuthenticating()
+            let isAuthenticating = await OpenAIOAuthService.shared.isDeviceCodeAuthorizing()
             let alert = AlertViewController(
                 title: String(localized: "ChatGPT OAuth Session"),
                 message: String(localized: "FlowDown refreshes and applies ChatGPT OAuth credentials automatically for this endpoint."),
@@ -122,7 +122,7 @@ private extension CloudModelEditorController {
                         context.dispose {
                             guard let self else { return }
                             Task { @MainActor in
-                                await OpenAIOAuthService.shared.cancelAuthorization()
+                                await OpenAIOAuthService.shared.cancelDeviceCodeAuthorization()
                                 self.rerenderContent()
                             }
                         }
@@ -144,32 +144,69 @@ private extension CloudModelEditorController {
 
     func runOpenAIOAuthFlow(force: Bool) async {
         do {
-            let authURL = try await OpenAIOAuthService.shared.beginAuthorization(force: force)
-            let opened = await openAuthorizationURL(authURL)
-            guard opened else {
-                await OpenAIOAuthService.shared.cancelAuthorization()
-                throw NSError(
-                    domain: "OpenAIOAuthService",
-                    code: -1,
-                    userInfo: [NSLocalizedDescriptionKey: "FlowDown could not open the ChatGPT sign-in page."],
-                )
-            }
-
-            try await OpenAIOAuthService.shared.awaitAuthorizationCompletion()
-            Indicator.present(title: "Connected", referencingView: view)
+            let session = try await OpenAIOAuthService.shared.beginDeviceCodeAuthorization(force: force)
+            presentDeviceCodeAlert(session: session)
         } catch {
             if (error as NSError).code != NSUserCancelledError {
                 presentOpenAIOAuthError(error)
             }
+            rerenderContent()
         }
-
-        rerenderContent()
     }
 
-    func openAuthorizationURL(_ authorizationURL: URL) async -> Bool {
-        await withCheckedContinuation { continuation in
-            UIApplication.shared.open(authorizationURL, options: [:]) { opened in
-                continuation.resume(returning: opened)
+    func presentDeviceCodeAlert(session: OpenAIOAuthService.DeviceCodeSession) {
+        let message = String(localized: "Open the link below and enter this one-time code to sign in. The code expires in 15 minutes.")
+            + "\n\n"
+            + session.verificationURL
+            + "\n\n"
+            + session.userCode
+
+        let alert = AlertViewController(
+            title: String(localized: "Sign In with Device Code"),
+            message: message,
+        ) { [weak self] context in
+            context.addAction(title: String(localized: "Open Link")) {
+                guard let url = URL(string: session.verificationURL) else { return }
+                UIApplication.shared.open(url, options: [:])
+            }
+            context.addAction(title: String(localized: "Copy Code")) {
+                UIPasteboard.general.string = session.userCode
+                guard let self else { return }
+                Indicator.present(title: "Copied", referencingView: self.view)
+            }
+            context.addAction(title: String(localized: "Cancel")) {
+                context.dispose {
+                    guard let self else { return }
+                    Task { @MainActor in
+                        await OpenAIOAuthService.shared.cancelDeviceCodeAuthorization()
+                        self.rerenderContent()
+                    }
+                }
+            }
+        }
+
+        topPresentedController()?.present(alert, animated: true)
+
+        Task { @MainActor [weak self, weak alert] in
+            do {
+                try await OpenAIOAuthService.shared.completeDeviceCodeAuthorization()
+                alert?.dismiss(animated: true) { [weak self] in
+                    guard let self else { return }
+                    Indicator.present(title: "Connected", referencingView: self.view)
+                    self.rerenderContent()
+                }
+            } catch is CancellationError {
+                alert?.dismiss(animated: true) { [weak self] in
+                    self?.rerenderContent()
+                }
+            } catch {
+                alert?.dismiss(animated: true) { [weak self] in
+                    guard let self else { return }
+                    if (error as NSError).code != NSUserCancelledError {
+                        self.presentOpenAIOAuthError(error)
+                    }
+                    self.rerenderContent()
+                }
             }
         }
     }

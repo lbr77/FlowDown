@@ -77,7 +77,6 @@ extension ConversationSessionManager.Session {
             let ans = try await ModelManager.shared.infer(
                 with: model,
                 input: messages,
-                requestSessionID: id,
             )
 
             let raw = ans.text

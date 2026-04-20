@@ -5,6 +5,7 @@
 //  Created by LiBr on 2026/4/19.
 //
 
+import ChatClientKit
 import Foundation
 import Storage
 
@@ -19,6 +20,15 @@ extension CloudModel {
         "HTTP-Referer",
         "X-Title",
     ]
+    static let openAICodexBodyFieldPreset: [String: Any] = [
+        FlowDownChatClientKitExtension.configurationKey: [
+            "environments": [Any](),
+            "request_modifiers": [
+                FlowDownChatClientKitExtension.predefinedOAuthCodexRequestModifier,
+            ],
+            "response_modifiers": [String](),
+        ],
+    ]
 
     var usesAutomaticOpenAIOAuth: Bool {
         Self.isOpenAICodexOAuthEndpoint(endpoint)
@@ -29,9 +39,7 @@ extension CloudModel {
             return false
         }
 
-        return [
-            openAICodexOAuthEndpoint,
-        ].contains(normalized)
+        return [openAICodexOAuthEndpoint].contains(normalized)
     }
 
     static func canonicalOpenAICodexOAuthEndpoint(for endpoint: String) -> String? {
@@ -68,6 +76,26 @@ extension CloudModel {
         components.path = path
 
         return components.string
+    }
+
+    static func mergedAutomaticOpenAIOAuthBodyFields(
+        into bodyFields: [String: Any]
+    ) -> [String: Any] {
+        var merged = bodyFields
+        let configurationKey = FlowDownChatClientKitExtension.configurationKey
+        let predefinedModifier = FlowDownChatClientKitExtension.predefinedOAuthCodexRequestModifier
+
+        var configuration = merged[configurationKey] as? [String: Any] ?? [:]
+        var requestModifiers = configuration["request_modifiers"] as? [String] ?? []
+        if !requestModifiers.contains(predefinedModifier) {
+            requestModifiers.append(predefinedModifier)
+        }
+
+        configuration["request_modifiers"] = requestModifiers
+        configuration["response_modifiers"] = configuration["response_modifiers"] ?? [String]()
+        configuration["environments"] = configuration["environments"] ?? [Any]()
+        merged[configurationKey] = configuration
+        return merged
     }
 }
 

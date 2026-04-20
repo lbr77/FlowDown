@@ -177,7 +177,7 @@ struct ImportExportRoundTripSuite {
             model_identifier: "",
             model_list_endpoint: "",
             endpoint: CloudModel.openAICodexOAuthEndpoint,
-            response_format: .codex,
+            response_format: .responses,
         )
         try sdb.cloudModelPut(oauthModel)
 

@@ -181,9 +181,28 @@ public extension CloudModel {
     enum ResponseFormat: String, CaseIterable, Codable {
         case chatCompletions
         case responses
-        case codex
 
         public static let `default`: CloudModel.ResponseFormat = .chatCompletions
+
+        static func legacyCompatible(rawValue: String) -> CloudModel.ResponseFormat? {
+            switch rawValue {
+            case "codex":
+                .responses
+            default:
+                CloudModel.ResponseFormat(rawValue: rawValue)
+            }
+        }
+
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.singleValueContainer()
+            let rawValue = try container.decode(String.self)
+            self = Self.legacyCompatible(rawValue: rawValue) ?? .default
+        }
+
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.singleValueContainer()
+            try container.encode(rawValue)
+        }
     }
 }
 
@@ -210,7 +229,7 @@ extension CloudModel: Updatable {
 extension CloudModel.ResponseFormat: ColumnCodable {
     public init?(with value: WCDBSwift.Value) {
         let text = value.stringValue
-        self = CloudModel.ResponseFormat(rawValue: text) ?? .default
+        self = CloudModel.ResponseFormat.legacyCompatible(rawValue: text) ?? .default
     }
 
     public func archivedValue() -> WCDBSwift.Value {
